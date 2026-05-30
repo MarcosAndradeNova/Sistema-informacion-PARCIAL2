@@ -54,8 +54,7 @@
             </a>
             @endif
 
-            <!-- SECCIÓN: EXÁMENES (EN CONSTRUCCIÓN) -->
-            {{--
+            <!-- SECCIÓN: EXÁMENES -->
             @if($isAdmin)
             <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Verificación de Exámenes</div>
             
@@ -66,7 +65,6 @@
                 <span x-show="!collapsed">Exámenes y Notas</span>
             </a>
             @endif
-            --}}
 
             <!-- SECCIÓN: GRUPOS -->
             @if($isAdmin)
@@ -78,8 +76,7 @@
                 <span x-show="!collapsed">Asignación de Grupos</span>
             </a>
 
-            <!-- SECCIÓN: REPORTES (EN CONSTRUCCIÓN) -->
-            {{--
+            <!-- SECCIÓN: REPORTES -->
             <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Reportes</div>
             <a href="{{ route('admin.reportes.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.reportes.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
                 <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.reportes.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,8 +84,6 @@
                 </svg>
                 <span x-show="!collapsed">Visualizar reportes</span>
             </a>
-            @endif
-            --}}
             @endif
         </nav>
 
