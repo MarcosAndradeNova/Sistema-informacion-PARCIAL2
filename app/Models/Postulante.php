@@ -22,7 +22,8 @@ class Postulante extends Model
         'tit_bachiller_nro',
         'ciudad',
         'estado_admision',
-        'observaciones_documentos'
+        'observaciones_documentos',
+        'grupo_id'
     ];
 
     public function usuario()
@@ -43,5 +44,10 @@ class Postulante extends Model
     public function segundaOpcion()
     {
         return $this->belongsTo(Carrera::class, 'carrera_segunda_opcion');
+    }
+
+    public function grupo()
+    {
+        return $this->belongsTo(Grupo::class, 'grupo_id');
     }
 }

@@ -41,4 +41,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/postulantes', [\App\Http\Controllers\AdminController::class, 'index'])->name('postulantes');
     Route::post('/postulantes/{ci}/aprobar', [\App\Http\Controllers\AdminController::class, 'aprobarDocumentos'])->name('postulantes.aprobar');
     Route::post('/postulantes/{ci}/rechazar', [\App\Http\Controllers\AdminController::class, 'rechazarDocumentos'])->name('postulantes.rechazar');
+    
+    // Grupos
+    Route::get('/grupos', [\App\Http\Controllers\Admin\GrupoController::class, 'index'])->name('grupos.index');
+    Route::post('/grupos/auto-assign', [\App\Http\Controllers\Admin\GrupoController::class, 'autoAssign'])->name('grupos.auto_assign');
+    Route::get('/grupos/{id}', [\App\Http\Controllers\Admin\GrupoController::class, 'show'])->name('grupos.show');
+    
+    // Reportes
+    Route::get('/reportes', [\App\Http\Controllers\Admin\ReporteController::class, 'index'])->name('reportes.index');
 });

@@ -33,4 +33,11 @@ class Usuario extends Model
     {
         return $this->hasOne(Postulante::class, 'ci_usuario', 'ci');
     }
+
+    public function gruposComoDocente()
+    {
+        return $this->belongsToMany(Grupo::class, 'grupo_docente_materia', 'ci_docente', 'grupo_id')
+                    ->withPivot('materia')
+                    ->withTimestamps();
+    }
 }

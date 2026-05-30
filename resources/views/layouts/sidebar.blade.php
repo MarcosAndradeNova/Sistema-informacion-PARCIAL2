@@ -36,7 +36,7 @@
             </a>
 
             <!-- SECCIÓN: POSTULANTES -->
-            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Postulantes</div>
+            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Registro de Postulantes</div>
             
             <a href="{{ route('inscripcion.estado') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('inscripcion.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
                 <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('inscripcion.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,13 +50,14 @@
                 <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.postulantes*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
-                <span x-show="!collapsed">Lista de Postulantes</span>
+                <span x-show="!collapsed">Registro de Postulantes</span>
             </a>
             @endif
 
-            <!-- SECCIÓN: EXÁMENES -->
+            <!-- SECCIÓN: EXÁMENES (EN CONSTRUCCIÓN) -->
+            {{--
             @if($isAdmin)
-            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Académico</div>
+            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Verificación de Exámenes</div>
             
             <a href="{{ route('examenes.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('examenes.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
                 <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('examenes.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,24 +66,29 @@
                 <span x-show="!collapsed">Exámenes y Notas</span>
             </a>
             @endif
+            --}}
 
             <!-- SECCIÓN: GRUPOS -->
             @if($isAdmin)
-            <a href="#" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Verificación de Grupos</div>
+            <a href="{{ route('admin.grupos.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.grupos.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
+                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.grupos.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                <span x-show="!collapsed">Grupos (Aulas)</span>
+                <span x-show="!collapsed">Asignación de Grupos</span>
             </a>
 
-            <!-- SECCIÓN: REPORTES -->
-            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Administración</div>
-            <a href="#" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 text-gray-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <!-- SECCIÓN: REPORTES (EN CONSTRUCCIÓN) -->
+            {{--
+            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Reportes</div>
+            <a href="{{ route('admin.reportes.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.reportes.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
+                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.reportes.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                <span x-show="!collapsed">Reportes</span>
+                <span x-show="!collapsed">Visualizar reportes</span>
             </a>
+            @endif
+            --}}
             @endif
         </nav>
 
