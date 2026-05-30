@@ -12,5 +12,5 @@ class Carrera extends Model
     protected $keyType = 'int';
     public $timestamps = false;
 
-    protected $fillable = ['codigo', 'nombre'];
+    protected $fillable = ['codigo', 'nombre', 'semestre', 'cupo'];
 }

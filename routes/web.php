@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
     Route::get('examenes', [\App\Http\Controllers\Examenes\ExamenController::class, 'index'])->name('examenes.index');
     Route::get('examenes/{ci}/edit', [\App\Http\Controllers\Examenes\ExamenController::class, 'edit'])->name('examenes.edit');
     Route::put('examenes/{ci}', [\App\Http\Controllers\Examenes\ExamenController::class, 'update'])->name('examenes.update');
+    // Configuración de Materias (Puntos)
+    Route::get('/examenes/configuracion', [\App\Http\Controllers\MateriaController::class, 'index'])->name('examenes.puntos');
+    Route::post('/examenes/configuracion', [\App\Http\Controllers\MateriaController::class, 'update'])->name('examenes.puntos.update');
 });
 
 require __DIR__.'/auth.php';
@@ -41,6 +44,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/postulantes', [\App\Http\Controllers\AdminController::class, 'index'])->name('postulantes');
     Route::post('/postulantes/{ci}/aprobar', [\App\Http\Controllers\AdminController::class, 'aprobarDocumentos'])->name('postulantes.aprobar');
     Route::post('/postulantes/{ci}/rechazar', [\App\Http\Controllers\AdminController::class, 'rechazarDocumentos'])->name('postulantes.rechazar');
+    
+    // Carreras
+    Route::get('/carreras', [\App\Http\Controllers\Admin\CarreraController::class, 'index'])->name('carreras.index');
+    Route::post('/carreras', [\App\Http\Controllers\Admin\CarreraController::class, 'update'])->name('carreras.update');
     
     // Grupos
     Route::get('/grupos', [\App\Http\Controllers\Admin\GrupoController::class, 'index'])->name('grupos.index');
