@@ -9,21 +9,20 @@ class Postulante extends Model
 {
     use HasFactory;
 
-    protected $table = 'postulantes';
+    protected $table = 'postulante';
     protected $primaryKey = 'ci_usuario';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'ci_usuario',
-        'carrera_primera_opcion',
-        'carrera_segunda_opcion',
-        'colegio_procedencia',
+        'rude',
+        'colegio_proc',
+        'tit_bachiller_nro',
         'ciudad',
-        'titulo_bachiller',
-        'otros_requisitos',
-        'pago_efectuado',
+        'estado_admision',
+        'observaciones_documentos'
     ];
 
     public function usuario()

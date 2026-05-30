@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Carrera extends Model
 {
-    protected $table = 'carreras';
-    protected $fillable = ['nombre', 'cupos_gestion'];
+    protected $table = 'carrera';
+    protected $primaryKey = 'codigo';
+    public $incrementing = false;
+    protected $keyType = 'int';
+    public $timestamps = false;
+
+    protected $fillable = ['codigo', 'nombre'];
 }

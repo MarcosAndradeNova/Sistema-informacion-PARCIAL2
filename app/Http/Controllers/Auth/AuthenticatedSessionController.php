@@ -26,9 +26,22 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        $request->session()->regenerate();
+        $user = Auth::user();
+        $usuario = \App\Models\Usuario::where('email', $user->email)->first();
+        
+        if (!$usuario) {
+            return redirect()->route('inscripcion.create');
+        }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $postulante = \App\Models\Postulante::where('ci_usuario', $usuario->ci)->first();
+
+        if (!$postulante) {
+            return redirect()->route('inscripcion.create');
+        } elseif ($postulante->estado_admision == 'POSTULANTE_ACTIVO') {
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+
+        return redirect()->route('inscripcion.estado');
     }
 
     /**

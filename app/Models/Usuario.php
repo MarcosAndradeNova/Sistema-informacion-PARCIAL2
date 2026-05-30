@@ -9,23 +9,24 @@ class Usuario extends Model
 {
     use HasFactory;
 
-    protected $table = 'usuarios';
+    protected $table = 'usuario';
     protected $primaryKey = 'ci';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'ci',
-        'nombres',
-        'apellidos',
-        'fecha_nacimiento',
-        'sexo',
-        'direccion',
+        'nombre',
+        'apellido_pat',
+        'apellido_mat',
+        'fechanac',
+        'email',
         'telefono',
-        'correo_electronico',
-        'password',
-        'rol',
+        'direccion',
+        'sexo',
+        'tipo',
+        'nacionalidad'
     ];
 
     public function postulante()

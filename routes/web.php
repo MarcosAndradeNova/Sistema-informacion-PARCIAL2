@@ -16,6 +16,15 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
+    // Flujo de Inscripción de Estudiantes
+    Route::get('/inscripcion', [\App\Http\Controllers\InscripcionController::class, 'create'])->name('inscripcion.create');
+    Route::post('/inscripcion', [\App\Http\Controllers\InscripcionController::class, 'store'])->name('inscripcion.store');
+    Route::get('/inscripcion/estado', [\App\Http\Controllers\InscripcionController::class, 'estado'])->name('inscripcion.estado');
+    
+    // Pasarela de Pago
+    Route::get('/pago', [\App\Http\Controllers\PagoController::class, 'create'])->name('pago.create');
+    Route::post('/pago', [\App\Http\Controllers\PagoController::class, 'store'])->name('pago.store');
+    
     // Módulo de Registro de Postulantes
     Route::resource('postulantes', \App\Http\Controllers\Postulantes\PostulanteController::class);
     
@@ -26,3 +35,10 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Rutas de Administrador
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/postulantes', [\App\Http\Controllers\AdminController::class, 'index'])->name('postulantes');
+    Route::post('/postulantes/{ci}/aprobar', [\App\Http\Controllers\AdminController::class, 'aprobarDocumentos'])->name('postulantes.aprobar');
+    Route::post('/postulantes/{ci}/rechazar', [\App\Http\Controllers\AdminController::class, 'rechazarDocumentos'])->name('postulantes.rechazar');
+});
