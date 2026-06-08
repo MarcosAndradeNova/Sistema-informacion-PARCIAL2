@@ -22,11 +22,15 @@
         
         <!-- Logo Header -->
         <div class="text-center mb-8">
-            <div class="w-16 h-16 bg-indigo-600 text-white flex items-center justify-center rounded-2xl font-bold text-3xl shadow-xl shadow-indigo-200 mx-auto mb-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-700 to-red-600 text-white flex items-center justify-center rounded-2xl font-bold text-3xl shadow-xl shadow-blue-200 mx-auto mb-4">
                 F
             </div>
             <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Acceso al Sistema</h2>
-            <p class="text-sm text-slate-500 mt-1 uppercase tracking-wider font-semibold">Admisión FICCT</p>
+            @if(request('role'))
+                <p class="text-sm text-red-600 mt-1 uppercase tracking-wider font-bold">Perfil: {{ ucfirst(request('role')) }}</p>
+            @else
+                <p class="text-sm text-slate-500 mt-1 uppercase tracking-wider font-semibold">Admisión FICCT</p>
+            @endif
         </div>
 
         <!-- Login Card -->
@@ -42,6 +46,7 @@
 
             <form method="POST" action="{{ route('login') }}" id="loginForm">
                 @csrf
+                <input type="hidden" name="role" value="{{ request('role') }}">
 
                 <!-- Email Address -->
                 <div class="mb-5">

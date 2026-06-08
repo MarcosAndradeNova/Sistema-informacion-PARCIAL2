@@ -8,6 +8,9 @@ class Materia extends Model
 {
     protected $fillable = [
         'nombre',
-        'puntos'
+        'puntos',
+        'docente_ci',
+        'temario_avance',
+        'enlaces_material'
     ];
 }

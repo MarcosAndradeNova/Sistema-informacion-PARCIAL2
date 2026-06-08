@@ -26,6 +26,7 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // Obtenemos el usuario autenticado e intentamos buscar su registro completo
         $user = Auth::user();
         $usuario = \App\Models\Usuario::where('email', $user->email)->first();
         
@@ -33,11 +34,13 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('inscripcion.create');
         }
 
+        // Buscamos si el usuario tiene un registro como postulante en el sistema
         $postulante = \App\Models\Postulante::where('ci_usuario', $usuario->ci)->first();
 
         if (!$postulante) {
             return redirect()->route('inscripcion.create');
         } elseif ($postulante->estado_admision == 'POSTULANTE_ACTIVO') {
+            // Redirigimos al dashboard principal si el postulante ya está activo
             return redirect()->intended(route('dashboard', absolute: false));
         }
 

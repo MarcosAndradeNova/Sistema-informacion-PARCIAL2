@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CUP - FICCT</title>
+    <title>Portal Universitario - FICCT</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -12,31 +12,35 @@
     <!-- Tailwind CSS (via Vite) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased font-['Inter'] text-slate-800 bg-slate-50">
+<body class="antialiased font-['Inter'] text-slate-800 bg-slate-50 flex flex-col min-h-screen">
 
     <!-- Navigation -->
-    <nav class="bg-white/80 backdrop-blur-md fixed w-full z-50 border-b border-slate-200">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <!-- Decorative Red/Blue top bar -->
+        <div class="h-1 w-full bg-gradient-to-r from-blue-700 via-blue-600 to-red-600"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-indigo-600 text-white flex items-center justify-center rounded-xl font-bold text-xl shadow-lg shadow-indigo-200">
+                    <!-- Mixed Blue & Red Logo -->
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-700 to-red-600 text-white flex items-center justify-center rounded-xl font-bold text-2xl shadow-md">
                         F
                     </div>
                     <div>
-                        <span class="font-bold text-xl tracking-tight block">FICCT</span>
-                        <span class="text-xs text-slate-500 font-medium tracking-wider uppercase">Admisión Universitaria</span>
+                        <span class="font-bold text-xl text-slate-900 tracking-tight block">FICCT</span>
+                        <span class="text-xs text-slate-500 font-semibold tracking-wider uppercase">Admisión Universitaria</span>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-4">
                     @if (Route::has('login'))
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Ir al Panel</a>
+                            <a href="{{ url('/dashboard') }}" class="text-sm font-semibold text-slate-600 hover:text-red-600 transition-colors">Ir al Panel</a>
                         @else
-                            <a href="{{ route('login') }}" class="px-5 py-2.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">Iniciar Sesión</a>
-                            
                             @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md hover:shadow-lg transition-all">Registrarse</a>
+                                <a href="{{ route('register') }}" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 rounded-lg shadow-md shadow-blue-200 hover:shadow-lg transition-all border-b-2 border-blue-900 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                                    Registrarse
+                                </a>
                             @endif
                         @endauth
                     @endif
@@ -45,164 +49,149 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <div class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-100 via-white to-white opacity-70"></div>
-        </div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-                Sistema de Admisión <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">Curso Preuniversitario</span>
-            </h1>
-            
-            <p class="mt-4 text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-                Gestiona tu postulación, revisa tus notas de Computación, Matemáticas, Inglés y Física, y conoce tu estado de admisión al instante.
-            </p>
-            
-            <div class="flex justify-center gap-4">
-                <a href="{{ route('login') }}" class="px-8 py-4 text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                    Ingresar al Sistema
-                </a>
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <!-- Hero & Access Section -->
+        <div class="relative pt-16 pb-16 lg:pt-24 lg:pb-24 overflow-hidden bg-white">
+            <div class="absolute inset-0 z-0 pointer-events-none">
+                <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-50/50 via-red-50/10 to-transparent rounded-full transform translate-x-1/3 -translate-y-1/3"></div>
             </div>
-        </div>
-    </div>
-
-    <!-- Features -->
-    <div class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-shadow">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Registro Fácil</h3>
-                    <p class="text-slate-600">Proceso de inscripción digitalizado y validado en tiempo real.</p>
+            
+            <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 relative">
+                    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
+                        Portal de Acceso Universitario
+                    </h1>
+                    <p class="text-lg text-slate-600 max-w-2xl mx-auto font-medium">
+                        Sistema Integrado del Curso Preuniversitario de la Facultad de Ingeniería en Ciencias de la Computación y Telecomunicaciones.
+                    </p>
                 </div>
                 
-                <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-shadow">
-                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Cálculo Automático</h3>
-                    <p class="text-slate-600">Promedios y estado de admisión procesados instantáneamente por el sistema.</p>
-                </div>
-                
-                <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-shadow">
-                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Asignación de Grupos</h3>
-                    <p class="text-slate-600">Distribución inteligente de estudiantes en aulas y horarios disponibles.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Institutional Info Section -->
-    <div class="py-20 bg-slate-50 border-t border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl font-bold text-slate-900 mb-6">Información Institucional</h2>
-                <p class="text-lg text-slate-600 mb-6 leading-relaxed">
-                    El Curso Pre-universitario (CUP) de la Facultad de Ingeniería en Ciencias de la Computación y Telecomunicaciones (FICCT) es una modalidad de ingreso presencial y virtual, dirigida a bachilleres que desean formar parte de una de las carreras tecnológicas con mayor crecimiento e impacto profesional.
-                </p>
-                <p class="text-lg text-slate-600 leading-relaxed">
-                    El programa cuenta con una carga académica mínima de 192 horas, brindando formación básica y nivelación académica para el ingreso universitario.
-                </p>
-            </div>
+                <!-- Role Cards (The Core Request) -->
+                <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 mt-12">
+                    
+                    <!-- Estudiante -->
+                    <a href="{{ route('login', ['role' => 'estudiante']) }}" class="group flex flex-col items-center bg-white border border-slate-200 rounded-2xl p-8 text-center hover:border-blue-600 hover:shadow-xl hover:shadow-blue-100/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                        <div class="w-20 h-20 bg-slate-50 text-slate-600 group-hover:bg-blue-700 group-hover:text-white rounded-2xl flex items-center justify-center mb-5 transition-colors duration-300 shadow-sm border border-slate-100 group-hover:border-blue-700">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-xl group-hover:text-blue-700 transition-colors mb-2">Estudiante</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            Acceso a notas, estado de postulación y horarios de grupos.
+                        </p>
+                    </a>
 
-            <!-- Carreras Disponibles -->
-            <h3 class="text-2xl font-bold text-center text-slate-900 mb-10">Carreras Disponibles</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-center">
-                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                    </div>
-                    <h4 class="font-bold text-slate-800">Ingeniería Informática</h4>
-                </div>
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-center">
-                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <h4 class="font-bold text-slate-800">Ingeniería de Sistemas</h4>
-                </div>
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-center">
-                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.906 14.142 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
-                    </div>
-                    <h4 class="font-bold text-slate-800">Ingeniería en Redes y Telecom.</h4>
-                </div>
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow text-center">
-                    <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    </div>
-                    <h4 class="font-bold text-slate-800">Ingeniería en Robótica</h4>
+                    <!-- Docente -->
+                    <a href="{{ route('login', ['role' => 'docente']) }}" class="group flex flex-col items-center bg-white border border-slate-200 rounded-2xl p-8 text-center hover:border-red-600 hover:shadow-xl hover:shadow-red-100/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-red-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                        <div class="w-20 h-20 bg-slate-50 text-slate-600 group-hover:bg-red-600 group-hover:text-white rounded-2xl flex items-center justify-center mb-5 transition-colors duration-300 shadow-sm border border-slate-100 group-hover:border-red-600">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-xl group-hover:text-red-600 transition-colors mb-2">Docente</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            Gestión de calificaciones, aulas y evaluación de postulantes.
+                        </p>
+                    </a>
+
+                    <!-- Administrativo -->
+                    <a href="{{ route('login', ['role' => 'administrativo']) }}" class="group flex flex-col items-center bg-white border border-slate-200 rounded-2xl p-8 text-center hover:border-slate-800 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-slate-800 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                        <div class="w-20 h-20 bg-slate-50 text-slate-600 group-hover:bg-slate-800 group-hover:text-white rounded-2xl flex items-center justify-center mb-5 transition-colors duration-300 shadow-sm border border-slate-100 group-hover:border-slate-800">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-xl group-hover:text-slate-800 transition-colors mb-2">Administrativo</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            Control académico, reportes y configuración del sistema.
+                        </p>
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Institutional Features -->
+        <div class="py-16 bg-slate-50 border-t border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="p-6 rounded-2xl bg-white border border-slate-100 shadow-sm group hover:border-red-200 transition-colors">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-700 rounded-lg flex items-center justify-center mb-5 group-hover:bg-red-50 group-hover:text-red-600 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Registro Digital</h3>
+                        <p class="text-sm text-slate-600">Proceso de inscripción simplificado y validado en tiempo real de forma segura.</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-2xl bg-white border border-slate-100 shadow-sm group hover:border-blue-200 transition-colors">
+                        <div class="w-12 h-12 bg-red-50 text-red-600 rounded-lg flex items-center justify-center mb-5 group-hover:bg-blue-50 group-hover:text-blue-700 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Resultados Automáticos</h3>
+                        <p class="text-sm text-slate-600">Procesamiento instantáneo de calificaciones y publicación de estados de admisión.</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-2xl bg-white border border-slate-100 shadow-sm group hover:border-slate-300 transition-colors">
+                        <div class="w-12 h-12 bg-slate-100 text-slate-700 rounded-lg flex items-center justify-center mb-5 group-hover:bg-slate-200 group-hover:text-slate-800 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Asignación Transparente</h3>
+                        <p class="text-sm text-slate-600">Distribución organizada de estudiantes en aulas mediante algoritmos optimizados.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-white pt-16 pb-8">
+    <footer class="bg-slate-900 text-slate-300 py-12 border-t-4 border-red-600">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-8">
                 
                 <!-- Brand Info -->
                 <div>
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-indigo-500 text-white flex items-center justify-center rounded-xl font-bold text-xl shadow-lg">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-700 to-red-600 text-white flex items-center justify-center rounded-xl font-bold text-xl shadow-lg">
                             F
                         </div>
-                        <span class="font-bold text-2xl tracking-tight block">FICCT</span>
+                        <span class="font-bold text-2xl tracking-tight text-white block">FICCT</span>
                     </div>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                    <p class="text-sm leading-relaxed max-w-xs">
                         Formación tecnológica para el futuro. Impulsando la innovación y el desarrollo profesional en ciencias de la computación.
                     </p>
                 </div>
 
-                <!-- Síguenos -->
+                <!-- Enlaces Rápidos -->
                 <div>
-                    <h4 class="text-lg font-semibold mb-6">Síguenos</h4>
-                    <p class="text-slate-400 text-sm mb-4">Mantente informado sobre convocatorias, noticias y actividades académicas de la FICCT.</p>
-                    <ul class="space-y-3">
-                        <li>
-                            <a href="#" class="text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm-1-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm5 7h-2v-3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5V17h-2v-6h2v1.5c.31-.62.92-1.5 2-1.5 1.1 0 2 .9 2 2V17z"/></svg>
-                                Sitio Web FICCT
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
-                                Facebook Facultativo
-                            </a>
-                        </li>
+                    <h4 class="text-lg font-bold text-white mb-4">Enlaces Rápidos</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-red-400 transition-colors">Portal UAGRM</a></li>
+                        <li><a href="#" class="hover:text-red-400 transition-colors">Carreras FICCT</a></li>
+                        <li><a href="#" class="hover:text-red-400 transition-colors">Soporte Técnico</a></li>
                     </ul>
                 </div>
 
-                <!-- Contáctanos -->
+                <!-- Contacto -->
                 <div>
-                    <h4 class="text-lg font-semibold mb-6">Contáctanos</h4>
-                    <ul class="space-y-4 text-slate-400 text-sm">
+                    <h4 class="text-lg font-bold text-white mb-4">Contacto</h4>
+                    <ul class="space-y-3 text-sm">
                         <li class="flex items-start gap-3">
-                            <span class="text-xl">📍</span>
+                            <span class="text-lg">📍</span>
                             <span>Ciudad Universitaria<br>Módulo 236</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-xl">📞</span>
+                            <span class="text-lg">📞</span>
                             <span>(+591) 70988656</span>
                         </li>
                         <li class="flex items-center gap-3">
-                            <span class="text-xl">✉️</span>
-                            <a href="mailto:cup.ficct@uagrm.edu.bo" class="hover:text-white transition-colors">cup.ficct@uagrm.edu.bo</a>
+                            <span class="text-lg">✉️</span>
+                            <a href="mailto:cup.ficct@uagrm.edu.bo" class="hover:text-red-400 transition-colors">cup.ficct@uagrm.edu.bo</a>
                         </li>
                     </ul>
                 </div>
             </div>
             
-            <div class="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
-                &copy; {{ date('Y') }} Facultad de Ingeniería en Ciencias de la Computación y Telecomunicaciones (FICCT). Todos los derechos reservados.
+            <div class="border-t border-slate-800 pt-8 text-center text-xs text-slate-500">
+                &copy; {{ date('Y') }} Facultad de Ingeniería en Ciencias de la Computación y Telecomunicaciones. Universidad Autónoma Gabriel René Moreno. Todos los derechos reservados.
             </div>
         </div>
     </footer>

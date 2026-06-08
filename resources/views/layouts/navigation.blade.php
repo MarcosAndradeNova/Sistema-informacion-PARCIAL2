@@ -20,13 +20,42 @@
                         {{ __('Admisión CUP') }}
                     </x-nav-link>
                     
-                    <x-nav-link :href="route('postulantes.index')" :active="request()->routeIs('postulantes.*')">
-                        {{ __('Postulantes') }}
-                    </x-nav-link>
+                    @php
+                        $usuarioInfo = \App\Models\Usuario::where('email', Auth::user()->email)->first();
+                        $usuarioTipo = $usuarioInfo ? $usuarioInfo->tipo : 'P';
+                        
+                        $esPostulanteActivo = false;
+                        if ($usuarioInfo) {
+                            $postulanteInfo = \App\Models\Postulante::where('ci_usuario', $usuarioInfo->ci)->first();
+                            if ($postulanteInfo && $postulanteInfo->estado_admision === 'POSTULANTE_ACTIVO') {
+                                $esPostulanteActivo = true;
+                            }
+                        }
+                    @endphp
 
-                    <x-nav-link :href="route('examenes.index')" :active="request()->routeIs('examenes.*')">
-                        {{ __('Exámenes y Notas') }}
-                    </x-nav-link>
+                    @if($esPostulanteActivo)
+                        <x-nav-link :href="route('estudiante.mi_grupo')" :active="request()->routeIs('estudiante.mi_grupo')">
+                            {{ __('Mi Grupo') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('estudiante.mis_materias')" :active="request()->routeIs('estudiante.mis_materias')">
+                            {{ __('Mis Materias') }}
+                        </x-nav-link>
+                        
+                        <x-nav-link :href="route('estudiante.mis_examenes')" :active="request()->routeIs('estudiante.mis_examenes')">
+                            {{ __('Mis Exámenes') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if($usuarioTipo === 'D' || $usuarioTipo === 'A')
+                        <x-nav-link :href="route('postulantes.index')" :active="request()->routeIs('postulantes.*')">
+                            {{ __('Postulantes') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('examenes.index')" :active="request()->routeIs('examenes.*')">
+                            {{ __('Exámenes y Notas') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -86,6 +115,30 @@
             <x-responsive-nav-link :href="route('inscripcion.estado')" :active="request()->routeIs('inscripcion.*')">
                 {{ __('Admisión CUP') }}
             </x-responsive-nav-link>
+
+            @if(isset($esPostulanteActivo) && $esPostulanteActivo)
+                <x-responsive-nav-link :href="route('estudiante.mi_grupo')" :active="request()->routeIs('estudiante.mi_grupo')">
+                    {{ __('Mi Grupo') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('estudiante.mis_materias')" :active="request()->routeIs('estudiante.mis_materias')">
+                    {{ __('Mis Materias') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('estudiante.mis_examenes')" :active="request()->routeIs('estudiante.mis_examenes')">
+                    {{ __('Mis Exámenes') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(isset($usuarioTipo) && ($usuarioTipo === 'D' || $usuarioTipo === 'A'))
+                <x-responsive-nav-link :href="route('postulantes.index')" :active="request()->routeIs('postulantes.*')">
+                    {{ __('Postulantes') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('examenes.index')" :active="request()->routeIs('examenes.*')">
+                    {{ __('Exámenes y Notas') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class CarreraController extends Controller
 {
+    // Obtiene y muestra todas las carreras para el administrador
     public function index()
     {
         $carreras = Carrera::orderBy('codigo')->get();
@@ -22,6 +23,7 @@ class CarreraController extends Controller
             'carreras.*.semestre' => 'required|string|max:20',
         ]);
 
+        // Itera y actualiza cupos y semestres de cada carrera
         foreach ($data['carreras'] as $codigo => $carreraData) {
             Carrera::where('codigo', $codigo)->update([
                 'cupo' => $carreraData['cupo'],
