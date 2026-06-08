@@ -13,6 +13,7 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Creamos o actualizamos el usuario administrador inicial del sistema
         User::updateOrCreate(
             ['email' => 'admin@ficct.edu'],
             [

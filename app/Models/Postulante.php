@@ -15,6 +15,7 @@ class Postulante extends Model
     protected $keyType = 'string';
     public $timestamps = false;
 
+    // Definimos los campos que se pueden llenar masivamente en el modelo
     protected $fillable = [
         'ci_usuario',
         'rude',
@@ -25,11 +26,13 @@ class Postulante extends Model
         'observaciones_documentos'
     ];
 
+    // Relación de un postulante con su usuario principal en la base
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'ci_usuario', 'ci');
     }
 
+    // Un postulante tiene muchas calificaciones asignadas en diferentes materias
     public function calificaciones()
     {
         return $this->hasMany(Calificacion::class, 'ci_usuario', 'ci_usuario');

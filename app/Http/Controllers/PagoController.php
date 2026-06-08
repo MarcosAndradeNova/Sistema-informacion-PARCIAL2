@@ -69,6 +69,25 @@ class PagoController extends Controller
 
         // Cambiar estado a POSTULANTE_ACTIVO
         $postulante->estado_admision = 'POSTULANTE_ACTIVO';
+        
+        // Asignación automática a un grupo con cupo disponible
+        $grupos = \App\Models\Grupo::where('estado', 1)->withCount('postulantes')->get();
+        $grupoDisponible = $grupos->first(function ($g) {
+            return $g->postulantes_count < $g->capacidad;
+        });
+            
+        if (!$grupoDisponible) {
+            $ultimoGrupo = \App\Models\Grupo::count();
+            $letra = chr(65 + $ultimoGrupo);
+            $grupoDisponible = \App\Models\Grupo::create([
+                'nombre' => 'Grupo ' . $letra,
+                'capacidad' => 70,
+                'estado' => true
+            ]);
+        }
+        
+        $postulante->grupo_id = $grupoDisponible->id;
+
         $postulante->save();
 
         return redirect()->route('inscripcion.estado')->with('success', '¡Pago confirmado! Has completado tu inscripción y ahora eres un Postulante Activo.');

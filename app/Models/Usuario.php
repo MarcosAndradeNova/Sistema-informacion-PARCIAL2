@@ -26,7 +26,8 @@ class Usuario extends Model
         'direccion',
         'sexo',
         'tipo',
-        'nacionalidad'
+        'nacionalidad',
+        'estado_aprobacion'
     ];
 
     public function postulante()

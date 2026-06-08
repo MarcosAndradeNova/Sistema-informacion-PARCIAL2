@@ -27,6 +27,7 @@
                         @csrf
                         @method('PUT')
 
+                        <!-- Formulario principal para registrar y calcular las notas del postulante -->
                         <div class="overflow-x-auto mb-6">
                             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-300">
@@ -46,6 +47,7 @@
                                             {{ $calificacion->materia }}
                                         </td>
                                         <td class="px-4 py-4">
+                                            <!-- Campos numéricos para ingresar cada una de las tres notas -->
                                             <input type="number" min="0" max="100" name="notas[{{ $calificacion->id }}][nota1]" value="{{ $calificacion->nota1 }}" class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-center focus:ring-indigo-500 p-1">
                                         </td>
                                         <td class="px-4 py-4">
@@ -58,6 +60,7 @@
                                             {{ $calificacion->promedio }}
                                         </td>
                                         <td class="px-4 py-4 text-center">
+                                            <!-- Mostramos un badge visual dependiendo del estado de aprobación final -->
                                             @if($calificacion->estado == 'APROBADO')
                                                 <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded dark:bg-green-900 dark:text-green-300 uppercase">
                                                     APROBADO

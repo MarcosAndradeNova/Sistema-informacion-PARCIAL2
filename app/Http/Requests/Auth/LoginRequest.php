@@ -69,6 +69,25 @@ class LoginRequest extends FormRequest
             }
         }
 
+        // Validar el rol seleccionado
+        if ($this->filled('role')) {
+            $requestedRole = strtolower($this->input('role'));
+            $usuario = \App\Models\Usuario::where('email', $this->input('email'))->first();
+            $tipo = $usuario ? $usuario->tipo : 'P'; // P por defecto si es nuevo o postulante
+
+            $isValidRole = false;
+            if ($requestedRole === 'docente' && $tipo === 'D') $isValidRole = true;
+            if ($requestedRole === 'administrativo' && $tipo === 'A') $isValidRole = true;
+            if ($requestedRole === 'estudiante' && $tipo === 'P') $isValidRole = true;
+
+            if (!$isValidRole) {
+                Auth::logout();
+                throw ValidationException::withMessages([
+                    'email' => 'Acceso denegado: Esta cuenta no pertenece a un ' . ucfirst($requestedRole) . '.'
+                ]);
+            }
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 
