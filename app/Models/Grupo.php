@@ -6,23 +6,31 @@ use Illuminate\Database\Eloquent\Model;
 
 class Grupo extends Model
 {
-    protected $table = 'grupos';
+    protected $table = 'grupo';
+    protected $primaryKey = 'codigo';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    public $timestamps = false;
 
     protected $fillable = [
+        'codigo',
         'nombre',
-        'capacidad',
-        'estado'
+        'cupo',
+        'idturno'
     ];
+
+    public function postulaciones()
+    {
+        return $this->hasMany(Postulacion::class, 'codgrupo', 'codigo');
+    }
+
+    public function grupodocentes()
+    {
+        return $this->hasMany(GrupoDocente::class, 'codigogrupo', 'codigo');
+    }
 
     public function postulantes()
     {
-        return $this->hasMany(Postulante::class, 'grupo_id');
-    }
-
-    public function docentes()
-    {
-        return $this->belongsToMany(Usuario::class, 'grupo_docente_materia', 'grupo_id', 'ci_docente')
-                    ->withPivot('materia')
-                    ->withTimestamps();
+        return $this->belongsToMany(Postulante::class, 'postulacion', 'codgrupo', 'ciusuario', 'codigo', 'ciusuario');
     }
 }

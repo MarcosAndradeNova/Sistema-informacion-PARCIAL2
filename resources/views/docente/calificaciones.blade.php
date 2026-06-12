@@ -56,40 +56,50 @@
                                         <tr>
                                             <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider border-r border-slate-600">N° Doc (CI)</th>
                                             <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider border-r border-slate-600">Apellidos y Nombres</th>
-                                            <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider border-r border-slate-600">1er Parcial<br><span class="text-[10px] font-normal text-gray-300">(Sobre 100)</span></th>
-                                            <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider border-r border-slate-600">2do Parcial<br><span class="text-[10px] font-normal text-gray-300">(Sobre 100)</span></th>
-                                            <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider border-r border-slate-600">Ex. Final<br><span class="text-[10px] font-normal text-gray-300">(Sobre 100)</span></th>
+                                            @foreach($examenes as $examen)
+                                            <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider border-r border-slate-600">{{ $examen->descripcion }}<br><span class="text-[10px] font-normal text-gray-300">(Sobre 100)</span></th>
+                                            @endforeach
                                             <th class="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">Promedio<br><span class="text-[10px] font-normal text-gray-300">Final</span></th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach($estudiantes as $estudiante)
                                             @php
-                                                $ci = $estudiante->ci_usuario;
-                                                $calif = $calificacionesMap[$ci] ?? null;
-                                                $n1 = $calif ? $calif->nota1 : '';
-                                                $n2 = $calif ? $calif->nota2 : '';
-                                                $n3 = $calif ? $calif->nota3 : '';
-                                                $promedio = $calif ? $calif->promedio : 0;
+                                                $ci = $estudiante->ciusuario;
+                                                $postulacion = $estudiante->postulaciones->whereIn('codgrupo', $codigosGrupos)->first();
+                                                $codpost = $postulacion ? $postulacion->codpost : '';
+                                                $codigogrupo = $postulacion ? $postulacion->codgrupo : '';
+
+                                                $suma = 0;
+                                                $cantidad = 0;
                                             @endphp
                                             <tr class="hover:bg-gray-50">
                                                 <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900 font-mono border-r border-gray-100">
                                                     {{ $ci }}
+                                                    <input type="hidden" name="notas[{{ $ci }}][codpost]" value="{{ $codpost }}">
+                                                    <input type="hidden" name="notas[{{ $ci }}][codigogrupo]" value="{{ $codigogrupo }}">
                                                 </td>
                                                 <td class="px-6 py-3 whitespace-nowrap border-r border-gray-100">
                                                     <div class="text-sm font-medium text-gray-900 uppercase">
-                                                        {{ $estudiante->usuario->apellido_pat ?? '' }} {{ $estudiante->usuario->apellido_mat ?? '' }} {{ $estudiante->usuario->nombre ?? '' }}
+                                                        {{ $estudiante->usuario->apellidopat ?? '' }} {{ $estudiante->usuario->apellidomat ?? '' }} {{ $estudiante->usuario->nombre ?? '' }}
                                                     </div>
                                                 </td>
-                                                <td class="px-4 py-3 whitespace-nowrap border-r border-gray-100 bg-gray-50/50">
-                                                    <input type="number" step="0.01" min="0" max="100" name="notas[{{ $ci }}][nota1]" value="{{ $n1 }}" class="w-full text-center text-sm border-gray-300 focus:border-blue-800 focus:ring-blue-800 shadow-sm px-2 py-1">
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap border-r border-gray-100 bg-gray-50/50">
-                                                    <input type="number" step="0.01" min="0" max="100" name="notas[{{ $ci }}][nota2]" value="{{ $n2 }}" class="w-full text-center text-sm border-gray-300 focus:border-blue-800 focus:ring-blue-800 shadow-sm px-2 py-1">
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap border-r border-gray-100 bg-gray-50/50">
-                                                    <input type="number" step="0.01" min="0" max="100" name="notas[{{ $ci }}][nota3]" value="{{ $n3 }}" class="w-full text-center text-sm border-gray-300 focus:border-blue-800 focus:ring-blue-800 shadow-sm px-2 py-1">
-                                                </td>
+                                                @foreach($examenes as $examen)
+                                                    @php
+                                                        $nro = $examen->nro;
+                                                        $calif = isset($calificacionesMap[$ci][$nro]) ? $calificacionesMap[$ci][$nro]->calificacion : '';
+                                                        if ($calif !== '') {
+                                                            $suma += floatval($calif);
+                                                            $cantidad++;
+                                                        }
+                                                    @endphp
+                                                    <td class="px-4 py-3 whitespace-nowrap border-r border-gray-100 bg-gray-50/50">
+                                                        <input type="number" step="0.01" min="0" max="100" name="notas[{{ $ci }}][nota{{ $nro }}]" value="{{ $calif }}" class="w-full text-center text-sm border-gray-300 focus:border-blue-800 focus:ring-blue-800 shadow-sm px-2 py-1">
+                                                    </td>
+                                                @endforeach
+                                                @php
+                                                    $promedio = $cantidad > 0 ? $suma / $examenes->count() : 0;
+                                                @endphp
                                                 <td class="px-6 py-3 whitespace-nowrap text-center bg-gray-50">
                                                     <span class="inline-flex items-center justify-center px-2 py-1 text-sm font-bold border {{ $promedio >= 51 ? 'border-green-200 bg-green-50 text-green-700' : 'border-red-200 bg-red-50 text-red-700' }}">
                                                         {{ number_format($promedio, 2) }}

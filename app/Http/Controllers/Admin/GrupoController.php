@@ -13,10 +13,13 @@ class GrupoController extends Controller
 {
     public function index()
     {
-        $grupos = Grupo::withCount('postulantes')->get();
+        $grupos = Grupo::all();
+        foreach($grupos as $g) {
+            $g->postulantes_count = \App\Models\Postulacion::where('codgrupo', $g->codigo)->count();
+        }
         
-        $totalVerificados = Postulante::where('estado_admision', 'POSTULANTE_ACTIVO')->count();
-        $totalAsignados = Postulante::whereNotNull('grupo_id')->count();
+        $totalVerificados = Postulante::where('estadodocum', 'INSCRITO')->count();
+        $totalAsignados = \App\Models\Postulacion::whereNotNull('codgrupo')->count();
         $totalGrupos = Grupo::count();
 
         return view('admin.grupos.index', compact('grupos', 'totalVerificados', 'totalAsignados', 'totalGrupos'));
@@ -25,13 +28,41 @@ class GrupoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255|unique:grupos',
+            'nombre' => 'required|string|max:255',
             'capacidad' => 'required|integer|min:1',
         ]);
 
-        Grupo::create($request->all());
+        $codigo = 'G' . (Grupo::count() + 1);
+        Grupo::create([
+            'codigo' => $codigo,
+            'nombre' => $request->nombre,
+            'cupo' => $request->capacidad,
+            'idturno' => 1
+        ]);
 
         return redirect()->route('admin.grupos.index')->with('success', 'Grupo creado exitosamente.');
+    }
+
+    public function edit($codigo)
+    {
+        $grupo = Grupo::where('codigo', $codigo)->firstOrFail();
+        return view('admin.grupos.edit', compact('grupo'));
+    }
+
+    public function update(Request $request, $codigo)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'capacidad' => 'required|integer|min:1',
+        ]);
+
+        $grupo = Grupo::where('codigo', $codigo)->firstOrFail();
+        $grupo->update([
+            'nombre' => $request->nombre,
+            'cupo' => $request->capacidad,
+        ]);
+
+        return redirect()->route('admin.grupos.index')->with('success', 'Grupo actualizado exitosamente.');
     }
 
     public function autoAssign()
@@ -39,55 +70,51 @@ class GrupoController extends Controller
         DB::beginTransaction();
 
         try {
-            // Postulantes activos que aún no tienen grupo
-            $postulantes = Postulante::where('estado_admision', 'POSTULANTE_ACTIVO')
-                                     ->whereNull('grupo_id')
+            // Postulantes activos que aún no tienen grupo (donde su postulacion no tiene codgrupo)
+            $postulantes = Postulante::where('estadodocum', 'INSCRITO')
+                                     ->whereHas('postulaciones', function($q) {
+                                         $q->whereNull('codgrupo');
+                                     })
                                      ->get();
 
             if ($postulantes->isEmpty()) {
                 return redirect()->route('admin.grupos.index')->with('info', 'No hay postulantes pendientes por asignar.');
             }
 
-            $totalPostulantes = $postulantes->count();
-            $maxPorGrupo = 70;
-
-            // Calcular cuántos grupos se necesitan
-            $cantidadGruposNecesarios = (int) ceil($totalPostulantes / $maxPorGrupo);
-
-            // Crear los grupos necesarios
-            $gruposCreados = [];
-            $ultimoGrupo = Grupo::count();
-            
-            for ($i = 1; $i <= $cantidadGruposNecesarios; $i++) {
-                $letra = chr(64 + $ultimoGrupo + $i); // A, B, C, etc.
-                $gruposCreados[] = Grupo::create([
-                    'nombre' => 'Grupo ' . $letra,
-                    'capacidad' => $maxPorGrupo,
-                    'estado' => true
-                ]);
-            }
-
-            // Distribuir equitativamente
-            $postulantesPorGrupo = (int) ceil($totalPostulantes / $cantidadGruposNecesarios);
-            
-            $indiceGrupo = 0;
-            $asignadosEnGrupoActual = 0;
-
             foreach ($postulantes as $postulante) {
-                if ($asignadosEnGrupoActual >= $postulantesPorGrupo) {
-                    $indiceGrupo++;
-                    $asignadosEnGrupoActual = 0;
+                // Find a group with available capacity
+                $grupos = Grupo::all();
+                $grupoDisponible = null;
+                
+                foreach ($grupos as $g) {
+                    $inscritos = \App\Models\Postulacion::where('codgrupo', $g->codigo)->count();
+                    if ($inscritos < $g->cupo) {
+                        $grupoDisponible = $g;
+                        break;
+                    }
                 }
 
-                $grupoActual = $gruposCreados[$indiceGrupo];
-                $postulante->grupo_id = $grupoActual->id;
-                $postulante->save();
+                // Si no hay grupos con espacio, crear uno nuevo
+                if (!$grupoDisponible) {
+                    $countGrupos = Grupo::count();
+                    $nuevoCodigo = 'G' . ($countGrupos + 1);
+                    $grupoDisponible = Grupo::create([
+                        'codigo' => $nuevoCodigo,
+                        'nombre' => 'Grupo ' . $nuevoCodigo,
+                        'cupo' => 70,
+                        'idturno' => 1
+                    ]);
+                }
 
-                $asignadosEnGrupoActual++;
+                $postulacion = \App\Models\Postulacion::where('ciusuario', $postulante->ciusuario)->first();
+                if ($postulacion) {
+                    $postulacion->codgrupo = $grupoDisponible->codigo;
+                    $postulacion->save();
+                }
             }
 
             DB::commit();
-            return redirect()->route('admin.grupos.index')->with('success', "Se asignaron {$totalPostulantes} postulantes equitativamente en {$cantidadGruposNecesarios} nuevos grupos.");
+            return redirect()->route('admin.grupos.index')->with('success', "Se asignaron exitosamente a los nuevos grupos.");
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -97,7 +124,9 @@ class GrupoController extends Controller
 
     public function show($id)
     {
-        $grupo = Grupo::with('postulantes.usuario')->findOrFail($id);
-        return view('admin.grupos.show', compact('grupo'));
+        // $id is the 'codigo' now
+        $grupo = Grupo::where('codigo', $id)->firstOrFail();
+        $postulaciones = \App\Models\Postulacion::with('postulante.usuario')->where('codgrupo', $grupo->codigo)->get();
+        return view('admin.grupos.show', compact('grupo', 'postulaciones'));
     }
 }

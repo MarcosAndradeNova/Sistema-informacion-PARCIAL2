@@ -67,10 +67,30 @@
                                 </ul>
                                 
                                 <div class="mt-6 pt-4 border-t border-gray-100">
-                                    <button class="w-full py-2.5 rounded-xl bg-gray-50 text-gray-600 font-semibold text-sm hover:bg-gray-100 transition focus:outline-none flex items-center justify-center group-hover:text-blue-600 group-hover:bg-blue-50">
-                                        Ver banco de preguntas
-                                        <svg class="w-4 h-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                    </button>
+                                    @php
+                                        $nombreMateria = mb_strtolower($materia->nombre, 'UTF-8');
+                                        $archivoPdf = null;
+                                        if (str_contains($nombreMateria, 'matem')) {
+                                            $archivoPdf = 'matematicas.pdf';
+                                        } elseif (str_contains($nombreMateria, 'computaci')) {
+                                            $archivoPdf = 'computacion.pdf';
+                                        } elseif (str_contains($nombreMateria, 'ingl')) {
+                                            $archivoPdf = 'ingles.pdf';
+                                        } elseif (str_contains($nombreMateria, 'físic') || str_contains($nombreMateria, 'fisic')) {
+                                            $archivoPdf = 'fisica.pdf';
+                                        }
+                                    @endphp
+
+                                    @if($archivoPdf)
+                                        <a href="{{ asset('bancos_preguntas/' . $archivoPdf) }}" target="_blank" class="w-full py-2.5 rounded-xl bg-blue-50 text-blue-600 font-semibold text-sm hover:bg-blue-100 transition flex items-center justify-center">
+                                            Descargar Banco de Preguntas (PDF)
+                                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                        </a>
+                                    @else
+                                        <button class="w-full py-2.5 rounded-xl bg-gray-50 text-gray-400 font-semibold text-sm cursor-not-allowed flex items-center justify-center" disabled title="Aún no disponible">
+                                            Banco de preguntas no disponible
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>

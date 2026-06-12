@@ -21,7 +21,7 @@ class ExamenController extends Controller
             $search = $request->input('search');
             $query->whereHas('usuario', function($q) use ($search) {
                 $q->where('nombre', 'ilike', "%{$search}%")
-                  ->orWhere('apellido_pat', 'ilike', "%{$search}%")
+                  ->orWhere('apellidopat', 'ilike', "%{$search}%")
                   ->orWhere('ci', 'ilike', "%{$search}%");
             });
         }
@@ -37,12 +37,12 @@ class ExamenController extends Controller
         // Ensure all 4 subjects exist for this postulante
         foreach ($this->materias as $materia) {
             Calificacion::firstOrCreate([
-                'ci_usuario' => $ci,
+                'ciusuario' => $ci,
                 'materia' => $materia
             ]);
         }
 
-        $calificaciones = Calificacion::where('ci_usuario', $ci)->get();
+        $calificaciones = Calificacion::where('ciusuario', $ci)->get();
 
         return view('examenes.edit', compact('postulante', 'calificaciones'));
     }
@@ -54,7 +54,7 @@ class ExamenController extends Controller
         $notas = $request->input('notas', []); // format: notas[id][nota1] = 50
         
         foreach ($notas as $id => $data) {
-            $calificacion = Calificacion::where('ci_usuario', $ci)->findOrFail($id);
+            $calificacion = Calificacion::where('ciusuario', $ci)->findOrFail($id);
             
             $n1 = isset($data['nota1']) ? (int)$data['nota1'] : 0;
             $n2 = isset($data['nota2']) ? (int)$data['nota2'] : 0;

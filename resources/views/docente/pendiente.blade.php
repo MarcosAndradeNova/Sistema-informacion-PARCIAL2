@@ -26,6 +26,9 @@
                     <p class="text-gray-600 mb-2">
                         Tu cuenta ha sido registrada con el rol de <span class="font-bold text-indigo-600">Docente</span>. Sin embargo, por políticas de seguridad académica, el acceso a los módulos de calificación y gestión de grupos requiere la validación manual por parte de un Administrador.
                     </p>
+                    <p class="text-gray-600 font-medium text-red-700 bg-red-50 p-3 rounded border border-red-100 mb-2">
+                        IMPORTANTE: Recuerda que debes dejar tus papeles físicos (Currículum y respaldos) en la secretaría de la facultad para completar el proceso de aprobación.
+                    </p>
                     <p class="text-gray-600">
                         Actualmente tu estado es: <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 border border-yellow-200 mt-2">PENDIENTE</span>
                     </p>

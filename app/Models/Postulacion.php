@@ -10,21 +10,30 @@ class Postulacion extends Model
     use HasFactory;
 
     protected $table = 'postulacion';
-    protected $primaryKey = 'cod_postulacion';
-    public $incrementing = false;
+    protected $primaryKey = 'codpost';
+    public $incrementing = true;
     protected $keyType = 'int';
     public $timestamps = false;
 
     protected $fillable = [
-        'cod_postulacion',
-        'estado_doc',
+        'codpost',
         'fecha',
         'hora',
-        'ci_usuario',
-        'id_pago',
-        'id_sem',
-        'cod_grupo',
-        'id_admision',
-        'cod_rol'
+        'idpago',
+        'idadmision',
+        'ciusuario',
+        'codrol',
+        'codgrupo',
+        'idsemestre'
     ];
+
+    public function grupo()
+    {
+        return $this->belongsTo(Grupo::class, 'codgrupo', 'codigo');
+    }
+
+    public function postulante()
+    {
+        return $this->belongsTo(Postulante::class, 'ciusuario', 'ciusuario');
+    }
 }

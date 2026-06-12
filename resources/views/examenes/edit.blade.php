@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Calificaciones de: ') }} {{ $postulante->usuario->nombre }} {{ $postulante->usuario->apellido_pat }}
+                {{ __('Calificaciones de: ') }} {{ $postulante->usuario->nombre }} {{ $postulante->usuario->apellidopat }}
             </h2>
             <a href="{{ route('examenes.index') }}" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Volver a la lista</a>
         </div>
@@ -23,7 +23,7 @@
                         </ul>
                     </div>
 
-                    <form method="POST" action="{{ route('examenes.update', $postulante->ci_usuario) }}">
+                    <form method="POST" action="{{ route('examenes.update', $postulante->ciusuario) }}">
                         @csrf
                         @method('PUT')
 

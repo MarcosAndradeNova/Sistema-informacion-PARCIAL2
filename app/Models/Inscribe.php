@@ -12,13 +12,13 @@ class Inscribe extends Model
     protected $table = 'inscribe';
     public $incrementing = false;
     // Definimos llaves primarias compuestas para la tabla inscribe
-    protected $primaryKey = ['codigo_post', 'codigo_carrera'];
+    protected $primaryKey = null; // Composite key
     public $timestamps = false;
 
     // Campos que pueden ser llenados masivamente en la inscripción
     protected $fillable = [
-        'codigo_post',
-        'codigo_carrera',
+        'codpost',
+        'codigocarrera',
         'opcion'
     ];
 }

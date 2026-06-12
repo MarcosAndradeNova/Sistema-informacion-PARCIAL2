@@ -22,7 +22,7 @@ class InscripcionController extends Controller
         
         $usuario = Usuario::where('email', $user->email)->first();
         
-        if ($usuario && Postulante::where('ci_usuario', $usuario->ci)->exists()) {
+        if ($usuario && Postulante::where('ciusuario', $usuario->ci)->exists()) {
             return redirect()->route('inscripcion.estado');
         }
 
@@ -38,18 +38,18 @@ class InscripcionController extends Controller
         $request->validate([
             'ci' => 'required|string|max:20',
             'nombre' => 'required|string|max:50',
-            'apellido_pat' => 'required|string|max:100',
-            'apellido_mat' => 'nullable|string|max:100',
+            'apellidopat' => 'required|string|max:100',
+            'apellidomat' => 'nullable|string|max:100',
             'fechanac' => 'required|date',
             'sexo' => 'required|string|size:1',
             'nacionalidad' => 'required|string|max:50',
             'direccion' => 'required|string|max:150',
             'telefono' => 'nullable|string|max:20',
             
-            'colegio_proc' => 'required|string|max:100',
+            'colegioprocedencia' => 'required|string|max:100',
             'ciudad' => 'required|string|max:50',
             'rude' => 'nullable|string|max:50',
-            'tit_bachiller_nro' => 'required|string|max:50',
+            'titulobachiller' => 'required|string|max:50',
             
             'carrera_primera_opcion' => 'required|exists:carrera,codigo',
             'carrera_segunda_opcion' => 'required|different:carrera_primera_opcion|exists:carrera,codigo',
@@ -66,8 +66,8 @@ class InscripcionController extends Controller
                 [
                     'ci' => $request->ci,
                     'nombre' => $request->nombre,
-                    'apellido_pat' => $request->apellido_pat,
-                    'apellido_mat' => $request->apellido_mat,
+                    'apellidopat' => $request->apellidopat,
+                    'apellidomat' => $request->apellidomat,
                     'fechanac' => $request->fechanac,
                     'sexo' => $request->sexo,
                     'nacionalidad' => $request->nacionalidad,
@@ -79,37 +79,67 @@ class InscripcionController extends Controller
 
             // 2. Crear el Postulante
             Postulante::updateOrCreate(
-                ['ci_usuario' => $usuario->ci],
+                ['ciusuario' => $usuario->ci],
                 [
                     'rude' => $request->rude,
-                    'colegio_proc' => $request->colegio_proc,
+                    'colegioprocedencia' => $request->colegioprocedencia,
                     'ciudad' => $request->ciudad,
-                    'tit_bachiller_nro' => $request->tit_bachiller_nro,
-                    'estado_admision' => 'DOCUMENTOS_PENDIENTES',
+                    'titulobachiller' => !empty($request->titulobachiller),
+                    'estadodocum' => 'PENDIENTE',
                 ]
             );
 
             // 3. Crear la Postulacion (Calculando el ID manual ya que la BD no tiene AUTO_INCREMENT)
-            $nuevoCod = Postulacion::max('cod_postulacion') + 1;
+            $nuevoCod = Postulacion::max('codpost') ?? 0;
+            $nuevoCod++;
             
+            // Garantizar que exista una admisión y semestre para evitar errores de llave foránea nula
+            $admision = DB::table('admision')->first();
+            if (!$admision) {
+                DB::table('admision')->insert(['id' => 1, 'estado' => 'Activa']);
+                $idadmision = 1;
+            } else {
+                $idadmision = $admision->id;
+            }
+
+            $semestre = DB::table('semestre')->first();
+            if (!$semestre) {
+                DB::table('semestre')->insert(['id' => 1, 'semestre' => 1, 'año' => date('Y')]);
+                $idsemestre = 1;
+            } else {
+                $idsemestre = $semestre->id;
+            }
+
+            // Garantizar que exista el rol Postulante para evitar errores
+            $rol = DB::table('rol')->where('descripcion', 'ilike', '%Postulante%')->first();
+            if (!$rol) {
+                $maxCod = DB::table('rol')->max('cod') ?? 0;
+                $codrol = $maxCod + 1;
+                DB::table('rol')->insert(['cod' => $codrol, 'descripcion' => 'Postulante']);
+            } else {
+                $codrol = $rol->cod;
+            }
+
             $postulacion = Postulacion::create([
-                'cod_postulacion' => $nuevoCod,
+                'codpost' => $nuevoCod,
                 'fecha' => now()->toDateString(),
                 'hora' => now()->toTimeString(),
-                'ci_usuario' => $usuario->ci,
-                'estado_doc' => 'PENDIENTE',
+                'idadmision' => $idadmision,
+                'idsemestre' => $idsemestre,
+                'codrol' => $codrol,
+                'ciusuario' => $usuario->ci
             ]);
 
             // 4. Crear la Inscribe para las carreras (opcion 1 y 2)
             Inscribe::create([
-                'codigo_post' => $postulacion->cod_postulacion,
-                'codigo_carrera' => $request->carrera_primera_opcion,
+                'codpost' => $postulacion->codpost,
+                'codigocarrera' => $request->carrera_primera_opcion,
                 'opcion' => 1
             ]);
 
             Inscribe::create([
-                'codigo_post' => $postulacion->cod_postulacion,
-                'codigo_carrera' => $request->carrera_segunda_opcion,
+                'codpost' => $postulacion->codpost,
+                'codigocarrera' => $request->carrera_segunda_opcion,
                 'opcion' => 2
             ]);
         });
@@ -129,7 +159,7 @@ class InscripcionController extends Controller
             return redirect()->route('inscripcion.create');
         }
 
-        $postulante = Postulante::where('ci_usuario', $usuario->ci)->first();
+        $postulante = Postulante::where('ciusuario', $usuario->ci)->first();
 
         if (!$postulante) {
             return redirect()->route('inscripcion.create');

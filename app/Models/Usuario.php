@@ -18,27 +18,24 @@ class Usuario extends Model
     protected $fillable = [
         'ci',
         'nombre',
-        'apellido_pat',
-        'apellido_mat',
+        'apellidopat',
+        'apellidomat',
+        'nacionalidad',
+        'sexo',
         'fechanac',
         'email',
         'telefono',
         'direccion',
-        'sexo',
-        'tipo',
-        'nacionalidad',
-        'estado_aprobacion'
+        'tipo'
     ];
 
     public function postulante()
     {
-        return $this->hasOne(Postulante::class, 'ci_usuario', 'ci');
+        return $this->hasOne(Postulante::class, 'ciusuario', 'ci');
     }
 
     public function gruposComoDocente()
     {
-        return $this->belongsToMany(Grupo::class, 'grupo_docente_materia', 'ci_docente', 'grupo_id')
-                    ->withPivot('materia')
-                    ->withTimestamps();
+        return $this->hasMany(GrupoDocente::class, 'ciusuario', 'ci');
     }
 }

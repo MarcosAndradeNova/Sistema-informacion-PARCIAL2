@@ -31,15 +31,23 @@ class AuthenticatedSessionController extends Controller
         $usuario = \App\Models\Usuario::where('email', $user->email)->first();
         
         if (!$usuario) {
-            return redirect()->route('inscripcion.create');
+            return redirect()->route('dashboard');
+        }
+
+        // Verificamos si es docente
+        if ($usuario->tipo === 'D') {
+            if ($usuario->true /* estado_aprobacion removed */) {
+                return redirect()->intended(route('dashboard', absolute: false));
+            }
+            return redirect()->route('docente.pendiente');
         }
 
         // Buscamos si el usuario tiene un registro como postulante en el sistema
-        $postulante = \App\Models\Postulante::where('ci_usuario', $usuario->ci)->first();
+        $postulante = \App\Models\Postulante::where('ciusuario', $usuario->ci)->first();
 
         if (!$postulante) {
             return redirect()->route('inscripcion.create');
-        } elseif ($postulante->estado_admision == 'POSTULANTE_ACTIVO') {
+        } elseif ($postulante->estadodocum == 'INSCRITO') {
             // Redirigimos al dashboard principal si el postulante ya está activo
             return redirect()->intended(route('dashboard', absolute: false));
         }

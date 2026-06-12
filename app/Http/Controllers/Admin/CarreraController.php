@@ -12,6 +12,20 @@ class CarreraController extends Controller
     public function index()
     {
         $carreras = Carrera::orderBy('codigo')->get();
+        // Cargar los cupos y semestres desde la tabla 'ofrece'
+        foreach ($carreras as $carrera) {
+            $ofrece = \Illuminate\Support\Facades\DB::table('ofrece')
+                ->where('codigocarre', $carrera->codigo)
+                ->first();
+                
+            $carrera->cupo = $ofrece ? $ofrece->cupo : 0;
+            if ($ofrece) {
+                $semestreObj = \Illuminate\Support\Facades\DB::table('semestre')->where('id', $ofrece->idsemestre)->first();
+                $carrera->semestre = $semestreObj ? $semestreObj->semestre . '/' . $semestreObj->año : '1/2026';
+            } else {
+                $carrera->semestre = '1/2026';
+            }
+        }
         return view('admin.carreras.index', compact('carreras'));
     }
 
@@ -25,10 +39,25 @@ class CarreraController extends Controller
 
         // Itera y actualiza cupos y semestres de cada carrera
         foreach ($data['carreras'] as $codigo => $carreraData) {
-            Carrera::where('codigo', $codigo)->update([
-                'cupo' => $carreraData['cupo'],
-                'semestre' => $carreraData['semestre'],
-            ]);
+            // Buscamos si existe un registro en 'ofrece'
+            $existe = \Illuminate\Support\Facades\DB::table('ofrece')
+                ->where('codigocarre', $codigo)
+                ->exists();
+                
+            if ($existe) {
+                \Illuminate\Support\Facades\DB::table('ofrece')
+                    ->where('codigocarre', $codigo)
+                    ->update([
+                        'cupo' => $carreraData['cupo']
+                    ]);
+            } else {
+                // Asumimos un idsemestre por defecto (1) si no existe
+                \Illuminate\Support\Facades\DB::table('ofrece')->insert([
+                    'codigocarre' => $codigo,
+                    'idsemestre' => 1,
+                    'cupo' => $carreraData['cupo']
+                ]);
+            }
         }
 
         return back()->with('success', 'Cupos y semestres actualizados correctamente.');

@@ -93,10 +93,10 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <!-- Colegio -->
                         <div>
-                            <label for="colegio_procedencia" class="block text-sm font-medium text-slate-700 mb-1">Colegio de Procedencia <span class="text-red-500">*</span></label>
-                            <input type="text" name="colegio_procedencia" id="colegio_procedencia" value="{{ old('colegio_procedencia') }}" required
+                            <label for="colegioprocedencia" class="block text-sm font-medium text-slate-700 mb-1">Colegio de Procedencia <span class="text-red-500">*</span></label>
+                            <input type="text" name="colegioprocedencia" id="colegioprocedencia" value="{{ old('colegioprocedencia') }}" required
                                    class="w-full rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 text-sm shadow-sm" placeholder="Nombre del colegio">
-                            @error('colegio_procedencia') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
+                            @error('colegioprocedencia') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                         </div>
 
                         <!-- Ciudad -->

@@ -59,37 +59,37 @@
                             @foreach($postulantes as $p)
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $p->ci_usuario }}</div>
-                                        <div class="text-sm text-gray-500">Tít: {{ $p->tit_bachiller_nro }}</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ $p->ciusuario }}</div>
+                                        <div class="text-sm text-gray-500">Tít: {{ $p->titulobachiller ? 'Sí' : 'No' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-bold text-gray-900">{{ $p->apellido_pat }} {{ $p->apellido_mat }} {{ $p->nombre }}</div>
+                                        <div class="text-sm font-bold text-gray-900">{{ $p->apellidopat }} {{ $p->apellidomat }} {{ $p->nombre }}</div>
                                         <div class="text-sm text-gray-500">{{ $p->email }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($p->estado_admision == 'DOCUMENTOS_PENDIENTES')
+                                        @if($p->estadodocum == 'PENDIENTE')
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                                 Pendiente de Revisión
                                             </span>
-                                        @elseif($p->estado_admision == 'PAGO_PENDIENTE')
+                                        @elseif($p->estadodocum == 'APROBADO')
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                                 Documentos Aprobados (Falta Pago)
                                             </span>
-                                        @elseif($p->estado_admision == 'DOCUMENTOS_RECHAZADOS')
+                                        @elseif($p->estadodocum == 'RECHAZADO')
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                                 Observado
                                             </span>
                                         @else
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                {{ str_replace('_', ' ', $p->estado_admision) }}
+                                                {{ str_replace('_', ' ', $p->estadodocum) }}
                                             </span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        @if($p->estado_admision == 'DOCUMENTOS_PENDIENTES' || $p->estado_admision == 'DOCUMENTOS_RECHAZADOS')
+                                        @if($p->estadodocum == 'PENDIENTE' || $p->estadodocum == 'RECHAZADO')
                                             <div class="flex justify-end space-x-2">
                                                 <!-- Botón Aprobar -->
-                                                <form action="{{ route('admin.postulantes.aprobar', $p->ci_usuario) }}" method="POST">
+                                                <form action="{{ route('admin.postulantes.aprobar', $p->ciusuario) }}" method="POST">
                                                     @csrf
                                                     <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-bold rounded shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none" onclick="return confirm('¿Confirmar que el estudiante entregó TODOS los documentos físicos?')">
                                                         Aprobar
@@ -97,14 +97,14 @@
                                                 </form>
 
                                                 <!-- Botón Observar (Abre Modal) -->
-                                                <button type="button" x-data="" x-on:click.prevent="$dispatch('open-modal', 'rechazar-{{ $p->ci_usuario }}')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-bold rounded shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none">
+                                                <button type="button" x-data="" x-on:click.prevent="$dispatch('open-modal', 'rechazar-{{ $p->ciusuario }}')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-bold rounded shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none">
                                                     Observar
                                                 </button>
                                             </div>
 
                                             <!-- Modal de Rechazo -->
-                                            <x-modal name="rechazar-{{ $p->ci_usuario }}" focusable>
-                                                <form method="post" action="{{ route('admin.postulantes.rechazar', $p->ci_usuario) }}" class="p-6 text-left">
+                                            <x-modal name="rechazar-{{ $p->ciusuario }}" focusable>
+                                                <form method="post" action="{{ route('admin.postulantes.rechazar', $p->ciusuario) }}" class="p-6 text-left">
                                                     @csrf
                                                     <h2 class="text-lg font-bold text-gray-900 mb-4">
                                                         Observar Documentación

@@ -17,7 +17,7 @@
                     <div class="w-full lg:w-5/12 bg-indigo-900 text-white p-8 lg:p-12 flex flex-col justify-between">
                         <div>
                             <div class="flex items-center mb-8">
-                                <x-application-logo class="block h-10 w-auto fill-current text-white opacity-90" />
+                                <img src="{{ asset('images/logo_universidad.png') }}" alt="Logo Universidad" class="block h-10 w-auto object-contain rounded">
                                 <span class="ml-3 text-xl font-bold tracking-widest text-indigo-100 uppercase">CUP FICCT</span>
                             </div>
                             
@@ -26,7 +26,7 @@
                             <div class="space-y-4 text-indigo-200">
                                 <div class="flex justify-between border-b border-indigo-800 pb-2">
                                     <span>Postulante:</span>
-                                    <span class="font-bold text-white">{{ $usuario->nombre }} {{ $usuario->apellido_pat }}</span>
+                                    <span class="font-bold text-white">{{ $usuario->nombre }} {{ $usuario->apellidopat }}</span>
                                 </div>
                                 <div class="flex justify-between border-b border-indigo-800 pb-2">
                                     <span>Carnet:</span>
@@ -72,7 +72,7 @@
                         <!-- Formulario y Contenido Dinámico -->
                         <form method="POST" action="{{ route('pago.store') }}">
                             @csrf
-                            <input type="hidden" name="metodo_pago" :value="metodo">
+                            <input type="hidden" name="metodopago" :value="metodo">
 
                             <!-- Vista QR -->
                             <div x-show="metodo === 'QR'" x-transition class="text-center pb-6">

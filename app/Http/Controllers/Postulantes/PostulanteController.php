@@ -57,10 +57,10 @@ class PostulanteController extends Controller
             ]);
 
             Postulante::create([
-                'ci_usuario' => $request->ci,
+                'ciusuario' => $request->ci,
                 'carrera_primera_opcion' => $request->carrera_primera_opcion,
                 'carrera_segunda_opcion' => $request->carrera_segunda_opcion,
-                'colegio_procedencia' => $request->colegio_procedencia,
+                'colegioprocedencia' => $request->colegioprocedencia,
                 'ciudad' => $request->ciudad,
                 'titulo_bachiller' => $request->has('titulo_bachiller'),
                 'otros_requisitos' => $request->otros_requisitos,
@@ -104,7 +104,7 @@ class PostulanteController extends Controller
             $postulante->update([
                 'carrera_primera_opcion' => $request->carrera_primera_opcion,
                 'carrera_segunda_opcion' => $request->carrera_segunda_opcion,
-                'colegio_procedencia' => $request->colegio_procedencia,
+                'colegioprocedencia' => $request->colegioprocedencia,
                 'ciudad' => $request->ciudad,
                 'titulo_bachiller' => $request->has('titulo_bachiller'),
                 'otros_requisitos' => $request->otros_requisitos,

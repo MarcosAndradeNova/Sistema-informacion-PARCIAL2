@@ -129,6 +129,13 @@
                     <a href="{{ route('login') }}" class="text-center text-sm font-semibold text-slate-600 hover:text-blue-700 hover:underline transition-colors">
                         ¿Ya tienes una cuenta? Iniciar sesión
                     </a>
+                    
+                    <div class="mt-2 pt-4 border-t border-slate-100 text-center">
+                        <span class="text-sm text-slate-500">¿Eres personal académico?</span>
+                        <a href="{{ route('docente.registro') }}" class="text-sm font-bold text-red-600 hover:text-red-700 hover:underline transition-colors ml-1">
+                            Regístrate como Docente
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>

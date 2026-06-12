@@ -13,7 +13,7 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-2xl border border-slate-100">
-                <form action="{{ route('postulantes.update', $postulante->ci_usuario) }}" method="POST" class="p-8" id="postulanteForm">
+                <form action="{{ route('postulantes.update', $postulante->ciusuario) }}" method="POST" class="p-8" id="postulanteForm">
                     @csrf
                     @method('PUT')
 
@@ -23,7 +23,7 @@
                         <!-- CI -->
                         <div>
                             <label for="ci" class="block text-sm font-medium text-slate-700 mb-1">Carnet de Identidad <span class="text-red-500">*</span></label>
-                            <input type="text" name="ci" id="ci" value="{{ old('ci', $postulante->ci_usuario) }}" required pattern="[0-9]+"
+                            <input type="text" name="ci" id="ci" value="{{ old('ci', $postulante->ciusuario) }}" required pattern="[0-9]+"
                                    class="w-full rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 text-sm shadow-sm" placeholder="Ej. 12345678">
                             @error('ci') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                         </div>
@@ -94,10 +94,10 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <!-- Colegio -->
                         <div>
-                            <label for="colegio_procedencia" class="block text-sm font-medium text-slate-700 mb-1">Colegio de Procedencia <span class="text-red-500">*</span></label>
-                            <input type="text" name="colegio_procedencia" id="colegio_procedencia" value="{{ old('colegio_procedencia', $postulante->colegio_procedencia) }}" required
+                            <label for="colegioprocedencia" class="block text-sm font-medium text-slate-700 mb-1">Colegio de Procedencia <span class="text-red-500">*</span></label>
+                            <input type="text" name="colegioprocedencia" id="colegioprocedencia" value="{{ old('colegioprocedencia', $postulante->colegioprocedencia) }}" required
                                    class="w-full rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500 text-sm shadow-sm" placeholder="Nombre del colegio">
-                            @error('colegio_procedencia') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
+                            @error('colegioprocedencia') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                         </div>
 
                         <!-- Ciudad -->

@@ -17,18 +17,26 @@ class DocenteDashboardController extends Controller
         return Usuario::where('email', Auth::user()->email)->first();
     }
 
-    public function misMaterias()
+    public function miMateria()
     {
         $docente = $this->getDocente();
-        $materias = Materia::where('docente_ci', $docente->ci)->get();
+        $materias = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                           ->where('grupodocente.ciusuario', $docente->ci)
+                           ->select('materia.*')
+                           ->distinct()
+                           ->get();
 
-        return view('docente.mis_materias', compact('materias'));
+        return view('docente.mi_materia', compact('materias'));
     }
 
     public function updateMateria(Request $request, $id)
     {
         $docente = $this->getDocente();
-        $materia = Materia::where('id', $id)->where('docente_ci', $docente->ci)->firstOrFail();
+        $materia = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                          ->where('materia.id', $id)
+                          ->where('grupodocente.ciusuario', $docente->ci)
+                          ->select('materia.*')
+                          ->firstOrFail();
         
         $request->validate([
             'temario_avance' => 'nullable|string',
@@ -39,26 +47,63 @@ class DocenteDashboardController extends Controller
         $materia->enlaces_material = $request->enlaces_material;
         $materia->save();
 
-        return redirect()->route('docente.mis_materias')->with('success', 'Material y temario actualizados correctamente.');
+        return redirect()->route('docente.mi_materia')->with('success', 'Material y temario actualizados correctamente.');
     }
 
-    public function misEstudiantes(Request $request)
+    public function misGrupos(Request $request)
     {
         $search = $request->input('search');
 
-        $grupos = Grupo::with(['postulantes' => function($query) use ($search) {
-            $query->where('estado_admision', 'POSTULANTE_ACTIVO')->with('usuario');
+        $docente = $this->getDocente();
+        $ciDocente = $docente ? $docente->ci : null;
+
+        if (!$ciDocente) {
+            $grupos = collect();
+            $gruposDocente = collect();
+            return view('docente.mis_grupos', compact('grupos', 'gruposDocente', 'search'));
+        }
+
+        // Obtener los grupos con sus respectivos horarios para este docente
+        $gruposDocente = \App\Models\GrupoDocente::where('ciusuario', $ciDocente)
+            ->join('grupo', 'grupodocente.codigogrupo', '=', 'grupo.codigo')
+            ->join('horario', 'grupodocente.idhorario', '=', 'horario.id')
+            ->select('grupodocente.*', 'grupo.nombre as nombre_grupo', 'horario.dia', 'horario.iniciohorario', 'horario.finhorario', 'horario.nroaula')
+            ->get();
+
+        $misGruposCodigos = $gruposDocente->pluck('codigogrupo');
+
+        $grupos = Grupo::whereIn('codigo', $misGruposCodigos)->with(['postulantes' => function($query) use ($search) {
+            $query->where('estadodocum', 'INSCRITO')->with('usuario');
             
             if ($search) {
                 $query->whereHas('usuario', function($q) use ($search) {
                     $q->where('nombre', 'ILIKE', "%{$search}%")
-                      ->orWhere('apellido_pat', 'ILIKE', "%{$search}%")
-                      ->orWhere('apellido_mat', 'ILIKE', "%{$search}%");
+                      ->orWhere('apellidopat', 'ILIKE', "%{$search}%")
+                      ->orWhere('apellidomat', 'ILIKE', "%{$search}%");
                 });
             }
         }])->get();
 
-        return view('docente.mis_estudiantes', compact('grupos', 'search'));
+        return view('docente.mis_grupos', compact('grupos', 'gruposDocente', 'search'));
+    }
+
+    public function updateWhatsapp(Request $request)
+    {
+        $request->validate([
+            'grupodocente_id' => 'required', // codigogrupo
+            'whatsapp_link' => 'nullable|url'
+        ]);
+
+        $docente = $this->getDocente();
+        $ciDocente = $docente ? $docente->ci : null;
+        
+        if ($ciDocente) {
+            \App\Models\GrupoDocente::where('ciusuario', $ciDocente)
+                ->where('codigogrupo', $request->grupodocente_id)
+                ->update(['whatsapp_link' => $request->whatsapp_link]);
+        }
+
+        return redirect()->route('docente.mis_grupos')->with('success', 'Enlace de WhatsApp actualizado correctamente.');
     }
 
     public function cronograma()
@@ -69,69 +114,101 @@ class DocenteDashboardController extends Controller
     public function calificaciones(Request $request)
     {
         $docente = $this->getDocente();
-        $materias = Materia::where('docente_ci', $docente->ci)->get();
+        $materias = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                           ->where('grupodocente.ciusuario', $docente->ci)
+                           ->select('materia.*')
+                           ->distinct()
+                           ->get();
         
         $materiaSeleccionada = null;
         $estudiantes = collect();
         $calificacionesMap = [];
+        $codigosGrupos = collect();
 
         if ($request->has('materia_id')) {
-            $materiaSeleccionada = Materia::where('id', $request->materia_id)
-                                          ->where('docente_ci', $docente->ci)
+            $materiaSeleccionada = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                                          ->where('materia.id', $request->materia_id)
+                                          ->where('grupodocente.ciusuario', $docente->ci)
+                                          ->select('materia.*')
                                           ->first();
                                           
             if ($materiaSeleccionada) {
-                // Obtener todos los estudiantes activos
-                $estudiantes = Postulante::where('estado_admision', 'POSTULANTE_ACTIVO')
-                                         ->with('usuario', 'grupo')
+                // Obtener los códigos de los grupos que el docente enseña para esta materia
+                $codigosGrupos = \App\Models\GrupoDocente::where('ciusuario', $docente->ci)
+                    ->where('idmateria', $materiaSeleccionada->id)
+                    ->pluck('codigogrupo');
+
+                // Obtener estudiantes activos inscritos en esos grupos
+                $estudiantes = Postulante::where('estadodocum', 'INSCRITO')
+                                         ->whereHas('grupos', function($query) use ($codigosGrupos) {
+                                             $query->whereIn('codigo', $codigosGrupos);
+                                         })
+                                         ->with(['usuario', 'postulaciones'])
                                          ->get();
                 
                 // Obtener calificaciones existentes para esta materia
-                $calificaciones = Calificacion::where('materia', $materiaSeleccionada->nombre)->get();
+                $calificaciones = \App\Models\ResultadoExam::where('idmateria', $materiaSeleccionada->id)->get();
                 foreach ($calificaciones as $calif) {
-                    $calificacionesMap[$calif->ci_usuario] = $calif;
+                    $calificacionesMap[$calif->ciusuario][$calif->nroexamen] = $calif;
                 }
             }
         }
 
-        return view('docente.calificaciones', compact('materias', 'materiaSeleccionada', 'estudiantes', 'calificacionesMap'));
+        $examenes = \Illuminate\Support\Facades\DB::table('examen')->get();
+        if ($examenes->isEmpty()) {
+            \Illuminate\Support\Facades\DB::table('examen')->insert([
+                ['nro' => 1, 'descripcion' => 'Primer Parcial', 'fecha' => now()],
+                ['nro' => 2, 'descripcion' => 'Segundo Parcial', 'fecha' => now()],
+                ['nro' => 3, 'descripcion' => 'Examen Final', 'fecha' => now()],
+            ]);
+            $examenes = \Illuminate\Support\Facades\DB::table('examen')->get();
+        }
+
+        return view('docente.calificaciones', compact('materias', 'materiaSeleccionada', 'estudiantes', 'calificacionesMap', 'examenes', 'codigosGrupos'));
     }
 
     public function updateCalificaciones(Request $request)
     {
         $request->validate([
-            'materia_id' => 'required|exists:materias,id',
+            'materia_id' => 'required|exists:materia,id',
             'notas' => 'required|array'
         ]);
 
         $docente = $this->getDocente();
-        $materia = Materia::where('id', $request->materia_id)->where('docente_ci', $docente->ci)->firstOrFail();
+        $materia = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                          ->where('materia.id', $request->materia_id)
+                          ->where('grupodocente.ciusuario', $docente->ci)
+                          ->select('materia.*')
+                          ->firstOrFail();
 
-        foreach ($request->notas as $ci_usuario => $datosNota) {
-            // Check if any note is filled
-            if (isset($datosNota['nota1']) || isset($datosNota['nota2']) || isset($datosNota['nota3'])) {
-                
-                $n1 = isset($datosNota['nota1']) && $datosNota['nota1'] !== '' ? floatval($datosNota['nota1']) : 0;
-                $n2 = isset($datosNota['nota2']) && $datosNota['nota2'] !== '' ? floatval($datosNota['nota2']) : 0;
-                $n3 = isset($datosNota['nota3']) && $datosNota['nota3'] !== '' ? floatval($datosNota['nota3']) : 0;
-                
-                // Promedio simple (puedes ajustarlo según tu lógica)
-                $promedio = ($n1 + $n2 + $n3) / 3;
-                $estado = $promedio >= 51 ? 'Aprobado' : 'Reprobado';
+        $examenes = \Illuminate\Support\Facades\DB::table('examen')->get();
 
-                Calificacion::updateOrCreate(
-                    [
-                        'ci_usuario' => $ci_usuario,
-                        'materia' => $materia->nombre
-                    ],
-                    [
-                        'nota1' => $n1,
-                        'nota2' => $n2,
-                        'nota3' => $n3,
-                        'promedio' => number_format($promedio, 2),
-                        'estado' => $estado
-                    ]
-                );
+        foreach ($request->notas as $ciusuario => $datosEstudiante) {
+            $codpost = $datosEstudiante['codpost'] ?? null;
+            $codigogrupo = $datosEstudiante['codigogrupo'] ?? null;
+
+            if (!$codpost || !$codigogrupo) continue;
+            
+            $codigogrupoEntero = intval(preg_replace('/[^0-9]/', '', $codigogrupo));
+
+            foreach ($examenes as $examen) {
+                $nro = $examen->nro;
+                if (isset($datosEstudiante['nota' . $nro]) && $datosEstudiante['nota' . $nro] !== '') {
+                    $calificacion = floatval($datosEstudiante['nota' . $nro]);
+
+                    \App\Models\ResultadoExam::updateOrCreate(
+                        [
+                            'nroexamen' => $nro,
+                            'ciusuario' => $ciusuario,
+                            'idmateria' => $materia->id
+                        ],
+                        [
+                            'codigogrupo' => $codigogrupoEntero,
+                            'codpost' => $codpost,
+                            'calificacion' => $calificacion
+                        ]
+                    );
+                }
             }
         }
 

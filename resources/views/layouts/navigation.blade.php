@@ -16,19 +16,29 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('inscripcion.estado')" :active="request()->routeIs('inscripcion.*')">
-                        {{ __('Admisión CUP') }}
-                    </x-nav-link>
+                    @if(($usuarioTipo === 'P' || !$usuarioInfo) && !request()->routeIs('docente.*'))
+                        <x-nav-link :href="route('inscripcion.estado')" :active="request()->routeIs('inscripcion.*')">
+                            {{ __('Admisión CUP') }}
+                        </x-nav-link>
+                    @endif
                     
                     @php
-                        $usuarioInfo = \App\Models\Usuario::where('email', Auth::user()->email)->first();
-                        $usuarioTipo = $usuarioInfo ? $usuarioInfo->tipo : 'P';
-                        
                         $esPostulanteActivo = false;
+                        $esDocenteAprobado = false;
+                        $esDocentePendiente = false;
+
                         if ($usuarioInfo) {
-                            $postulanteInfo = \App\Models\Postulante::where('ci_usuario', $usuarioInfo->ci)->first();
-                            if ($postulanteInfo && $postulanteInfo->estado_admision === 'POSTULANTE_ACTIVO') {
-                                $esPostulanteActivo = true;
+                            if ($usuarioInfo->tipo === 'P') {
+                                $postulanteInfo = \App\Models\Postulante::where('ciusuario', $usuarioInfo->ci)->first();
+                                if ($postulanteInfo && $postulanteInfo->estadodocum === 'INSCRITO') {
+                                    $esPostulanteActivo = true;
+                                }
+                            } elseif ($usuarioInfo->tipo === 'D') {
+                                if (true) {
+                                    $esDocenteAprobado = true;
+                                } else {
+                                    $esDocentePendiente = true;
+                                }
                             }
                         }
                     @endphp
@@ -47,13 +57,28 @@
                         </x-nav-link>
                     @endif
 
-                    @if($usuarioTipo === 'D' || $usuarioTipo === 'A')
+                    @if($esDocentePendiente)
+                        <x-nav-link :href="route('docente.pendiente')" :active="request()->routeIs('docente.pendiente')">
+                            {{ __('Estado Docente') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if($esDocenteAprobado || $usuarioTipo === 'A')
                         <x-nav-link :href="route('postulantes.index')" :active="request()->routeIs('postulantes.*')">
                             {{ __('Postulantes') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('examenes.index')" :active="request()->routeIs('examenes.*')">
                             {{ __('Exámenes y Notas') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if($esDocenteAprobado)
+                        <x-nav-link :href="route('docente.mis_materias')" :active="request()->routeIs('docente.mis_materias')">
+                            {{ __('Mis Materias') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('docente.cronograma')" :active="request()->routeIs('docente.cronograma')">
+                            {{ __('Cronograma') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -112,9 +137,11 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('inscripcion.estado')" :active="request()->routeIs('inscripcion.*')">
-                {{ __('Admisión CUP') }}
-            </x-responsive-nav-link>
+            @if(isset($usuarioTipo) && ($usuarioTipo === 'P' || !$usuarioInfo) && !request()->routeIs('docente.*'))
+                <x-responsive-nav-link :href="route('inscripcion.estado')" :active="request()->routeIs('inscripcion.*')">
+                    {{ __('Admisión CUP') }}
+                </x-responsive-nav-link>
+            @endif
 
             @if(isset($esPostulanteActivo) && $esPostulanteActivo)
                 <x-responsive-nav-link :href="route('estudiante.mi_grupo')" :active="request()->routeIs('estudiante.mi_grupo')">
@@ -130,13 +157,28 @@
                 </x-responsive-nav-link>
             @endif
 
-            @if(isset($usuarioTipo) && ($usuarioTipo === 'D' || $usuarioTipo === 'A'))
+            @if(isset($esDocentePendiente) && $esDocentePendiente)
+                <x-responsive-nav-link :href="route('docente.pendiente')" :active="request()->routeIs('docente.pendiente')">
+                    {{ __('Estado Docente') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(isset($esDocenteAprobado) && ($esDocenteAprobado || $usuarioTipo === 'A'))
                 <x-responsive-nav-link :href="route('postulantes.index')" :active="request()->routeIs('postulantes.*')">
                     {{ __('Postulantes') }}
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('examenes.index')" :active="request()->routeIs('examenes.*')">
                     {{ __('Exámenes y Notas') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(isset($esDocenteAprobado) && $esDocenteAprobado)
+                <x-responsive-nav-link :href="route('docente.mis_materias')" :active="request()->routeIs('docente.mis_materias')">
+                    {{ __('Mis Materias') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('docente.cronograma')" :active="request()->routeIs('docente.cronograma')">
+                    {{ __('Cronograma') }}
                 </x-responsive-nav-link>
             @endif
         </div>

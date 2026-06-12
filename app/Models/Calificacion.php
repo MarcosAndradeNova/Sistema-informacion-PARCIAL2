@@ -12,7 +12,7 @@ class Calificacion extends Model
     protected $table = 'calificaciones_postulante';
 
     protected $fillable = [
-        'ci_usuario',
+        'ciusuario',
         'materia',
         'nota1',
         'nota2',
@@ -23,6 +23,6 @@ class Calificacion extends Model
 
     public function postulante()
     {
-        return $this->belongsTo(Postulante::class, 'ci_usuario', 'ci_usuario');
+        return $this->belongsTo(Postulante::class, 'ciusuario', 'ciusuario');
     }
 }

@@ -17,11 +17,11 @@ class Pago extends Model
 
     protected $fillable = [
         'id',
-        'numero_recibo',
+        'numerorecibo',
         'monto',
-        'metodo_pago',
+        'metodopago',
         'estado',
         'fecha',
-        'ci_usuario',
+        'ciusuario',
     ];
 }

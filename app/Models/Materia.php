@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Materia extends Model
 {
+    protected $table = 'materia';
+    public $timestamps = false;
+
     protected $fillable = [
         'nombre',
-        'puntos',
-        'docente_ci',
-        'temario_avance',
-        'enlaces_material'
+        'puntos'
     ];
 }

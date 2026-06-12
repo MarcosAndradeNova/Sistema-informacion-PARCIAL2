@@ -43,10 +43,10 @@
                                     @endphp
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                         <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            {{ $post->ci_usuario }}
+                                            {{ $post->ciusuario }}
                                         </td>
                                         <td class="px-6 py-4">
-                                            {{ $post->usuario->nombre ?? '' }} {{ $post->usuario->apellido_pat ?? '' }}
+                                            {{ $post->usuario->nombre ?? '' }} {{ $post->usuario->apellidopat ?? '' }}
                                         </td>
                                         <td class="px-6 py-4">
                                             {{ $evaluadas }} / 4
@@ -61,7 +61,7 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 text-center">
-                                            <a href="{{ route('examenes.edit', $post->ci_usuario) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                                            <a href="{{ route('examenes.edit', $post->ciusuario) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                                                 Registrar / Ver Notas
                                             </a>
                                         </td>

@@ -62,13 +62,13 @@
                                 </div>
 
                                 <div>
-                                    <label for="apellido_pat" class="block text-sm font-medium text-gray-700">Apellido Paterno *</label>
-                                    <input type="text" name="apellido_pat" id="apellido_pat" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('apellido_pat') }}">
+                                    <label for="apellidopat" class="block text-sm font-medium text-gray-700">Apellido Paterno *</label>
+                                    <input type="text" name="apellidopat" id="apellidopat" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('apellidopat') }}">
                                 </div>
 
                                 <div>
-                                    <label for="apellido_mat" class="block text-sm font-medium text-gray-700">Apellido Materno</label>
-                                    <input type="text" name="apellido_mat" id="apellido_mat" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('apellido_mat') }}">
+                                    <label for="apellidomat" class="block text-sm font-medium text-gray-700">Apellido Materno</label>
+                                    <input type="text" name="apellidomat" id="apellidomat" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('apellidomat') }}">
                                 </div>
 
                                 <div>
@@ -107,8 +107,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 
                                 <div>
-                                    <label for="colegio_proc" class="block text-sm font-medium text-gray-700">Colegio de Procedencia *</label>
-                                    <input type="text" name="colegio_proc" id="colegio_proc" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('colegio_proc') }}">
+                                    <label for="colegioprocedencia" class="block text-sm font-medium text-gray-700">Colegio de Procedencia *</label>
+                                    <input type="text" name="colegioprocedencia" id="colegioprocedencia" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('colegioprocedencia') }}">
                                 </div>
 
                                 <div>
@@ -146,8 +146,8 @@
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <label for="tit_bachiller_nro" class="block text-sm font-medium text-gray-700">Número de Título de Bachiller y Serie *</label>
-                                    <input type="text" name="tit_bachiller_nro" id="tit_bachiller_nro" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('tit_bachiller_nro') }}" placeholder="Ej. 12345 - Serie A">
+                                    <label for="titulobachiller" class="block text-sm font-medium text-gray-700">Número de Título de Bachiller y Serie *</label>
+                                    <input type="text" name="titulobachiller" id="titulobachiller" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('titulobachiller') }}" placeholder="Ej. 12345 - Serie A">
                                 </div>
 
                                 </div>

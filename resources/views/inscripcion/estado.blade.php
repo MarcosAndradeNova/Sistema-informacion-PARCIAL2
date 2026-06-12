@@ -44,8 +44,8 @@
                             <!-- Step 2: Documentos -->
                             <div class="flex flex-col items-center">
                                 @php
-                                    $isDocsDone = in_array($postulante->estado_admision, ['DOCUMENTOS_VERIFICADOS', 'PAGO_PENDIENTE', 'PAGO_CONFIRMADO', 'POSTULANTE_ACTIVO']);
-                                    $isDocsCurrent = in_array($postulante->estado_admision, ['DOCUMENTOS_PENDIENTES', 'DOCUMENTOS_RECHAZADOS']);
+                                    $isDocsDone = in_array($postulante->estadodocum, ['VERIFICADO', 'APROBADO', 'INSCRITO', 'INSCRITO']);
+                                    $isDocsCurrent = in_array($postulante->estadodocum, ['PENDIENTE', 'RECHAZADO']);
                                 @endphp
                                 <div class="h-12 w-12 rounded-full {{ $isDocsDone ? 'bg-indigo-600 text-white border-white' : ($isDocsCurrent ? 'bg-white border-4 border-indigo-600 text-indigo-600' : 'bg-white border-4 border-gray-300 text-gray-400') }} flex items-center justify-center shadow-md">
                                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,8 +58,8 @@
                             <!-- Step 3: Pago -->
                             <div class="flex flex-col items-center">
                                 @php
-                                    $isPagoDone = in_array($postulante->estado_admision, ['PAGO_CONFIRMADO', 'POSTULANTE_ACTIVO']);
-                                    $isPagoCurrent = $postulante->estado_admision == 'PAGO_PENDIENTE';
+                                    $isPagoDone = in_array($postulante->estadodocum, ['INSCRITO', 'INSCRITO']);
+                                    $isPagoCurrent = $postulante->estadodocum == 'APROBADO';
                                 @endphp
                                 <div class="h-12 w-12 rounded-full {{ $isPagoDone ? 'bg-indigo-600 text-white border-white' : ($isPagoCurrent ? 'bg-white border-4 border-indigo-600 text-indigo-600' : 'bg-white border-4 border-gray-300 text-gray-400') }} flex items-center justify-center shadow-md">
                                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -72,7 +72,7 @@
                             <!-- Step 4: Postulante -->
                             <div class="flex flex-col items-center">
                                 @php
-                                    $isActive = $postulante->estado_admision == 'POSTULANTE_ACTIVO';
+                                    $isActive = $postulante->estadodocum == 'INSCRITO';
                                 @endphp
                                 <div class="h-12 w-12 rounded-full {{ $isActive ? 'bg-indigo-600 text-white border-white' : 'bg-white border-4 border-gray-300 text-gray-400' }} flex items-center justify-center shadow-md">
                                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,7 +87,7 @@
 
                     <!-- Estado Actual Detail Box -->
                     <div class="bg-gray-50 rounded-xl p-8 border border-gray-200">
-                        @if($postulante->estado_admision == 'DOCUMENTOS_PENDIENTES')
+                        @if($postulante->estadodocum == 'PENDIENTE')
                             <div class="text-center">
                                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
                                     <svg class="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,7 +117,7 @@
                                 </div>
                             </div>
                         
-                        @elseif($postulante->estado_admision == 'DOCUMENTOS_RECHAZADOS')
+                        @elseif($postulante->estadodocum == 'RECHAZADO')
                             <div class="text-center">
                                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
                                     <svg class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -130,11 +130,11 @@
                                 </p>
                                 <div class="bg-red-50 p-6 rounded-lg border border-red-200 text-left">
                                     <h4 class="font-bold text-red-800 mb-2">Observaciones del Administrador:</h4>
-                                    <p class="text-red-700">{{ $postulante->observaciones_documentos ?? 'No hay detalles. Acércate a la oficina.' }}</p>
+                                    <p class="text-red-700">No hay detalles. Acércate a la oficina.</p>
                                 </div>
                             </div>
 
-                        @elseif($postulante->estado_admision == 'DOCUMENTOS_VERIFICADOS' || $postulante->estado_admision == 'PAGO_PENDIENTE')
+                        @elseif($postulante->estadodocum == 'VERIFICADO' || $postulante->estadodocum == 'APROBADO')
                             <div class="text-center">
                                 <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
                                     <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -154,7 +154,7 @@
                                 <p class="mt-4 text-sm text-gray-500">Monto a pagar: Bs. 300.- (Inscripción CUP)</p>
                             </div>
 
-                        @elseif($postulante->estado_admision == 'POSTULANTE_ACTIVO')
+                        @elseif($postulante->estadodocum == 'INSCRITO')
                             <div class="text-center">
                                 <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-4">
                                     <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

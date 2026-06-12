@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Asignación de Grupos') }}
+            {{ __('Gestión de Grupos') }}
         </h2>
     </x-slot>
 
@@ -62,17 +62,25 @@
                 </div>
             </div>
 
-            <!-- Botón de Asignación Automática -->
-            <div class="bg-white p-6 rounded-xl shadow-sm mb-8 flex justify-between items-center">
+            <!-- Formulario de Creación de Grupo -->
+            <div class="bg-white p-6 rounded-xl shadow-sm mb-8 flex justify-between items-center border border-gray-200">
                 <div>
-                    <h3 class="text-lg font-bold text-gray-800">Asignación Automática</h3>
-                    <p class="text-gray-600 text-sm">Asigna automáticamente a los postulantes verificados a los grupos equitativamente (Máx. 70 por grupo).</p>
+                    <h3 class="text-lg font-bold text-gray-800">Crear Nuevo Grupo</h3>
+                    <p class="text-gray-600 text-sm">Crea manualmente un nuevo grupo con su capacidad respectiva.</p>
                 </div>
-                <form action="{{ route('admin.grupos.auto_assign') }}" method="POST">
+                <form action="{{ route('admin.grupos.store') }}" method="POST" class="flex items-end space-x-4">
                     @csrf
-                    <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded hover:bg-indigo-700 transition flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        Asignar Automáticamente
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Nombre</label>
+                        <input type="text" name="nombre" placeholder="Ej. Grupo G4" required class="border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Cupo</label>
+                        <input type="number" name="capacidad" value="70" required min="1" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm w-24">
+                    </div>
+                    <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-md hover:bg-indigo-700 transition flex items-center h-10">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Crear Grupo
                     </button>
                 </form>
             </div>
@@ -96,33 +104,38 @@
                                 @forelse ($grupos as $grupo)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $grupo->id }}
+                                            {{ $grupo->codigo }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $grupo->nombre }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1 dark:bg-gray-200">
-                                                @php $porcentaje = ($grupo->postulantes_count / $grupo->capacidad) * 100; @endphp
+                                                @php 
+                                                    $cupo = $grupo->cupo ?? 70; // Fallback to 70 if missing
+                                                    $porcentaje = $cupo > 0 ? ($grupo->postulantes_count / $cupo) * 100 : 0; 
+                                                @endphp
                                                 <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ min($porcentaje, 100) }}%"></div>
                                             </div>
-                                            <div class="text-sm text-gray-500">{{ $grupo->postulantes_count }} / {{ $grupo->capacidad }} inscritos</div>
+                                            <div class="text-sm text-gray-500">{{ $grupo->postulantes_count }} / {{ $cupo }} inscritos</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($grupo->estado)
+                                            @if(isset($grupo->estado) && $grupo->estado)
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
                                             @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Inactivo</span>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
                                             @endif
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('admin.grupos.show', $grupo->id) }}" class="text-indigo-600 hover:text-indigo-900">Ver Detalles</a>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                            <a href="{{ route('admin.grupos.show', $grupo->codigo) }}" class="text-indigo-600 hover:text-indigo-900 font-bold">Detalles</a>
+                                            <span class="text-gray-300">|</span>
+                                            <a href="{{ route('admin.grupos.edit', $grupo->codigo) }}" class="text-blue-600 hover:text-blue-900 font-bold">Editar</a>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                            No hay grupos creados todavía. Usa el botón de asignación automática.
+                                            No hay grupos creados todavía. Usa el formulario de arriba para crear uno.
                                         </td>
                                     </tr>
                                 @endforelse

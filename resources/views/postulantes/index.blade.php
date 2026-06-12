@@ -59,7 +59,7 @@
                             @forelse($postulantes as $postulante)
                                 <tr class="hover:bg-slate-50/50 transition-colors">
                                     <td class="px-6 py-4 font-medium text-slate-900">
-                                        {{ $postulante->ci_usuario }}
+                                        {{ $postulante->ciusuario }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="font-bold text-slate-900">{{ $postulante->usuario->nombres }} {{ $postulante->usuario->apellidos }}</div>
@@ -76,10 +76,10 @@
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <div class="flex justify-center gap-2">
-                                            <a href="{{ route('postulantes.edit', $postulante->ci_usuario) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 p-2 rounded-lg transition-colors tooltip" title="Editar">
+                                            <a href="{{ route('postulantes.edit', $postulante->ciusuario) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 p-2 rounded-lg transition-colors tooltip" title="Editar">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                             </a>
-                                            <form action="{{ route('postulantes.destroy', $postulante->ci_usuario) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este postulante?');">
+                                            <form action="{{ route('postulantes.destroy', $postulante->ciusuario) }}" method="POST" class="inline" onsubmit="return confirm('¿Está seguro de eliminar este postulante?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 p-2 rounded-lg transition-colors tooltip" title="Eliminar">

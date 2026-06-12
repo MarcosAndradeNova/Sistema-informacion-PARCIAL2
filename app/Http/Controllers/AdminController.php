@@ -12,9 +12,9 @@ class AdminController extends Controller
     public function index()
     {
         $postulantes = DB::table('postulante')
-            ->join('usuario', 'postulante.ci_usuario', '=', 'usuario.ci')
-            ->select('postulante.*', 'usuario.nombre', 'usuario.apellido_pat', 'usuario.apellido_mat', 'usuario.email')
-            ->orderBy('usuario.apellido_pat')
+            ->join('usuario', 'postulante.ciusuario', '=', 'usuario.ci')
+            ->select('postulante.*', 'usuario.nombre', 'usuario.apellidopat', 'usuario.apellidomat', 'usuario.email')
+            ->orderBy('usuario.apellidopat')
             ->get();
 
         return view('admin.postulantes', compact('postulantes'));
@@ -22,9 +22,9 @@ class AdminController extends Controller
 
     public function aprobarDocumentos(Request $request, $ci)
     {
-        $postulante = Postulante::where('ci_usuario', $ci)->firstOrFail();
-        $postulante->estado_admision = 'PAGO_PENDIENTE';
-        $postulante->observaciones_documentos = null;
+        $postulante = Postulante::where('ciusuario', $ci)->firstOrFail();
+        $postulante->estadodocum = 'APROBADO';
+        // $postulante->observaciones_documentos = null;
         $postulante->save();
 
         return redirect()->route('admin.postulantes')->with('success', 'Documentos aprobados exitosamente.');
@@ -36,9 +36,9 @@ class AdminController extends Controller
             'observaciones' => 'required|string|max:1000'
         ]);
 
-        $postulante = Postulante::where('ci_usuario', $ci)->firstOrFail();
-        $postulante->estado_admision = 'DOCUMENTOS_RECHAZADOS';
-        $postulante->observaciones_documentos = $request->observaciones;
+        $postulante = Postulante::where('ciusuario', $ci)->firstOrFail();
+        $postulante->estadodocum = 'RECHAZADO';
+        // $postulante->observaciones_documentos = $request->observaciones;
         $postulante->save();
 
         return redirect()->route('admin.postulantes')->with('error', 'Documentos observados correctamente.');

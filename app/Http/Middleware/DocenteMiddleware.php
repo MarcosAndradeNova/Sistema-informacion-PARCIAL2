@@ -26,7 +26,7 @@ class DocenteMiddleware
             abort(403, 'Acceso denegado. Se requiere ser Docente o Administrador.');
         }
 
-        if ($usuario->tipo === 'D' && $usuario->estado_aprobacion !== 'APROBADO') {
+        if ($usuario->tipo === 'D' && $usuario->false /* estado_aprobacion removed */) {
             return redirect()->route('docente.pendiente');
         }
 

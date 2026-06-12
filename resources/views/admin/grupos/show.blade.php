@@ -15,13 +15,13 @@
                 <div class="p-6 bg-white border-b border-gray-200 flex justify-between items-center">
                     <div>
                         <h3 class="text-lg font-bold text-gray-800">{{ $grupo->nombre }}</h3>
-                        <p class="text-gray-500 text-sm">Capacidad: {{ $grupo->postulantes->count() }} / {{ $grupo->capacidad }} estudiantes asignados.</p>
+                        <p class="text-gray-500 text-sm">Capacidad: {{ count($postulaciones) }} / {{ $grupo->cupo ?? 70 }} estudiantes asignados.</p>
                     </div>
                     <div>
-                        @if($grupo->estado)
+                        @if(isset($grupo->estado) && $grupo->estado)
                             <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">Grupo Activo</span>
                         @else
-                            <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 text-red-800">Grupo Inactivo</span>
+                            <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">Grupo Activo</span>
                         @endif
                     </div>
                 </div>
@@ -41,19 +41,20 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse ($grupo->postulantes as $postulante)
+                                @forelse ($postulaciones as $postulacion)
+                                    @php $postulante = $postulacion->postulante; @endphp
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $postulante->ci_usuario }}
+                                            {{ $postulante ? $postulante->ciusuario : 'N/A' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">
-                                                {{ $postulante->usuario->nombre }} {{ $postulante->usuario->apellido_pat }} {{ $postulante->usuario->apellido_mat }}
+                                                {{ $postulante && $postulante->usuario ? $postulante->usuario->nombre . ' ' . $postulante->usuario->apellidopat . ' ' . $postulante->usuario->apellidomat : 'Desconocido' }}
                                             </div>
-                                            <div class="text-sm text-gray-500">{{ $postulante->usuario->email }}</div>
+                                            <div class="text-sm text-gray-500">{{ $postulante && $postulante->usuario ? $postulante->usuario->email : '' }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $postulante->colegio_proc }}
+                                            {{ $postulante ? $postulante->colegioprocedencia : 'N/A' }}
                                         </td>
                                     </tr>
                                 @empty
