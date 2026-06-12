@@ -253,7 +253,54 @@ class EstudianteDashboardController extends Controller
             return redirect()->route('dashboard');
         }
 
-        // Obtener resultados del estudiante
+        // Obtener la postulación para saber el grupo
+        $postulacion = Postulacion::where('ciusuario', $postulante->ciusuario)->first();
+        
+        // Exámenes globales (1, 2, 3)
+        $examenesGlobales = DB::table('examen')->orderBy('nro')->get();
+        
+        $cronograma = collect();
+
+        if ($postulacion && $postulacion->codgrupo) {
+            // Obtenemos los registros de grupodocente para saber las materias y aulas de este grupo
+            $grupoDocentes = GrupoDocente::with(['materia', 'horario'])
+                ->where('codigogrupo', $postulacion->codgrupo)
+                ->get();
+            
+            // Para cada materia asignada al grupo, creamos 3 entradas de exámenes
+            foreach ($grupoDocentes as $gd) {
+                if ($gd->materia) {
+                    $aula = $gd->horario ? $gd->horario->nroaula : 'Por Asignar';
+                    
+                    foreach ($examenesGlobales as $examen) {
+                        $fechaEspecifica = $gd->{'fecha_examen'.$examen->nro} ?? $examen->fecha;
+                        $cronograma->push((object)[
+                            'materia' => $gd->materia->nombre,
+                            'nro_examen' => $examen->nro,
+                            'descripcion' => $examen->descripcion . ' - ' . $gd->materia->nombre,
+                            'fecha' => $fechaEspecifica,
+                            'aula' => $aula
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // Si el grupo no tiene materias asignadas o el estudiante no tiene grupo, 
+        // mostraremos los exámenes genéricos (solo los 3) o vacío.
+        if ($cronograma->isEmpty() && $examenesGlobales->isNotEmpty()) {
+            foreach ($examenesGlobales as $examen) {
+                $cronograma->push((object)[
+                    'materia' => 'General',
+                    'nro_examen' => $examen->nro,
+                    'descripcion' => $examen->descripcion,
+                    'fecha' => $examen->fecha,
+                    'aula' => 'Por Asignar'
+                ]);
+            }
+        }
+
+        // Obtener resultados del estudiante para la libreta
         $resultadosDB = ResultadoExam::with('materia')
             ->where('ciusuario', $postulante->ciusuario)
             ->get();
@@ -295,6 +342,6 @@ class EstudianteDashboardController extends Controller
             ]);
         }
 
-        return view('estudiante.mis_examenes', compact('calificaciones'));
+        return view('estudiante.mis_examenes', compact('calificaciones', 'cronograma'));
     }
 }

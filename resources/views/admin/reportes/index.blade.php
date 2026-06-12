@@ -70,16 +70,17 @@
             <!-- Tabla de Reporte (Contenedor PDF) -->
             <div id="reporte-contenedor" class="bg-white shadow-sm border border-gray-200 rounded-xl overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-200 bg-slate-800 flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-white uppercase tracking-wide" x-text="tituloReporte">Listado General de Estudiantes</h3>
+                    <h3 class="text-lg font-bold text-white uppercase tracking-wide" x-text="tituloReporte">Listado General</h3>
                     <span class="text-xs font-bold text-slate-800 bg-white px-3 py-1 rounded-full shadow-sm">
-                        <span x-text="filteredEstudiantes.length"></span> Registros
+                        <span x-text="currentType === 'estudiantes' ? filteredEstudiantes.length : filteredDocentes.length"></span> Registros
                     </span>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-300">
                         <thead class="bg-gray-50">
-                            <tr>
+                            <!-- Encabezados para Estudiantes -->
+                            <tr x-show="currentType === 'estudiantes'">
                                 <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">CI</th>
                                 <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Estudiante</th>
                                 <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Grupo</th>
@@ -87,39 +88,74 @@
                                 <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Promedio Gral.</th>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado Notas</th>
                             </tr>
+                            <!-- Encabezados para Docentes -->
+                            <tr x-show="currentType === 'docentes'" style="display: none;">
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">CI</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Docente</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Profesión</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado Cuenta</th>
+                            </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <template x-for="est in filteredEstudiantes" :key="est.ci">
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono" x-text="est.ci"></td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-bold text-gray-900" x-text="est.nombre"></div>
-                                        <div class="text-xs text-gray-500" x-text="est.email"></div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold" 
-                                              :class="est.grupo === 'SIN GRUPO' ? 'bg-red-100 text-red-800' : 'bg-indigo-100 text-indigo-800'"
-                                              x-text="est.grupo">
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900" x-text="est.estado_docum"></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-mono font-bold text-gray-900" x-text="est.promedio"></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                                        <span class="inline-flex items-center justify-center px-3 py-1 text-xs font-bold rounded-full border"
-                                              :class="{
-                                                'bg-green-50 border-green-200 text-green-700': est.estado === 'APROBADO',
-                                                'bg-red-50 border-red-200 text-red-700': est.estado === 'REPROBADO',
-                                                'bg-gray-100 border-gray-200 text-gray-600': est.estado === 'SIN NOTAS'
-                                              }"
-                                              x-text="est.estado">
-                                        </span>
-                                    </td>
-                                </tr>
+                            <!-- Filas para Estudiantes -->
+                            <template x-if="currentType === 'estudiantes'">
+                                <template x-for="est in filteredEstudiantes" :key="est.ci">
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono" x-text="est.ci"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-bold text-gray-900" x-text="est.nombre"></div>
+                                            <div class="text-xs text-gray-500" x-text="est.email"></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold" 
+                                                  :class="est.grupo === 'SIN GRUPO' ? 'bg-red-100 text-red-800' : 'bg-indigo-100 text-indigo-800'"
+                                                  x-text="est.grupo">
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900" x-text="est.estado_docum"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-mono font-bold text-gray-900" x-text="est.promedio"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="inline-flex items-center justify-center px-3 py-1 text-xs font-bold rounded-full border"
+                                                  :class="{
+                                                    'bg-green-50 border-green-200 text-green-700': est.estado === 'APROBADO',
+                                                    'bg-red-50 border-red-200 text-red-700': est.estado === 'REPROBADO',
+                                                    'bg-gray-100 border-gray-200 text-gray-600': est.estado === 'SIN NOTAS'
+                                                  }"
+                                                  x-text="est.estado">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
                             </template>
-                            <tr x-show="filteredEstudiantes.length === 0">
+
+                            <!-- Filas para Docentes -->
+                            <template x-if="currentType === 'docentes'">
+                                <template x-for="doc in filteredDocentes" :key="doc.ci">
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono" x-text="doc.ci"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-bold text-gray-900" x-text="doc.nombre"></div>
+                                            <div class="text-xs text-gray-500" x-text="doc.email"></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700" x-text="doc.profesion"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="inline-flex items-center justify-center px-3 py-1 text-xs font-bold rounded-full border"
+                                                  :class="{
+                                                    'bg-green-50 border-green-200 text-green-700': doc.estado === 'APROBADO',
+                                                    'bg-amber-50 border-amber-200 text-amber-700': doc.estado === 'PENDIENTE',
+                                                    'bg-red-50 border-red-200 text-red-700': doc.estado === 'RECHAZADO'
+                                                  }"
+                                                  x-text="doc.estado">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
+
+                            <tr x-show="(currentType === 'estudiantes' && filteredEstudiantes.length === 0) || (currentType === 'docentes' && filteredDocentes.length === 0)">
                                 <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                                     <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    No se encontraron estudiantes que coincidan con la búsqueda.
+                                    No se encontraron registros que coincidan con la búsqueda.
                                 </td>
                             </tr>
                         </tbody>
@@ -133,7 +169,9 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('reportesApp', () => ({
+                currentType: 'estudiantes', // estudiantes o docentes
                 estudiantes: @json($estudiantesData),
+                docentes: @json($docentesData),
                 searchQuery: '',
                 isListening: false,
                 recognition: null,
@@ -186,26 +224,47 @@
                 processVoiceCommand(command) {
                     console.log("Comando recibido:", command);
                     
+                    // Seleccionar tipo de reporte
+                    if (command.includes("docente") || command.includes("profesor")) {
+                        this.currentType = 'docentes';
+                        this.searchQuery = ''; // Si solo dice "lista de docentes", limpiamos la búsqueda
+                        if (command.includes("aprobado")) this.searchQuery = "APROBADO";
+                        if (command.includes("pendiente")) this.searchQuery = "PENDIENTE";
+                        return;
+                    }
+                    
+                    if (command.includes("postulante") || command.includes("estudiante") || command.includes("alumno")) {
+                        this.currentType = 'estudiantes';
+                    }
+
                     // IA Mapeo Básico de Intenciones
                     if (command.includes("sin grupo") || command.includes("no tienen grupo")) {
+                        this.currentType = 'estudiantes';
                         this.searchQuery = "SIN GRUPO";
                     } else if (command.includes("aprobados")) {
                         this.searchQuery = "APROBADO";
                     } else if (command.includes("reprobados") || command.includes("aplazados")) {
                         this.searchQuery = "REPROBADO";
                     } else if (command.includes("inscritos")) {
+                        this.currentType = 'estudiantes';
                         this.searchQuery = "INSCRITO";
                     } else if (command.includes("grupo")) {
-                        // Extraer numero, ej "grupo uno"
+                        this.currentType = 'estudiantes';
+                        // Extraer numero, ej "grupo uno" o "grupo g1"
                         const numMap = {"uno": 1, "dos": 2, "tres": 3, "cuatro": 4};
                         let found = command.replace(/uno|dos|tres|cuatro/g, m => numMap[m]);
-                        let match = found.match(/\d+/);
+                        let match = found.match(/(?:g|G)?\d+/); // puede capturar "1", "G1", "g1"
                         if (match) {
-                            this.searchQuery = "Grupo " + match[0];
+                            let gNum = match[0].toUpperCase();
+                            if (!gNum.startsWith("G")) {
+                                gNum = "G" + gNum; // Si solo dijo "grupo 1", lo convertimos a "Grupo G1" para que coincida con la BD
+                            }
+                            this.searchQuery = "Grupo " + gNum;
                         } else {
                             this.searchQuery = command;
                         }
                     } else {
+                        // Si no cae en nada en específico pero queremos buscar texto
                         this.searchQuery = command;
                     }
                 },
@@ -223,16 +282,29 @@
                     });
                 },
 
+                get filteredDocentes() {
+                    if (this.searchQuery === '') return this.docentes;
+                    
+                    const lowerQuery = this.searchQuery.toLowerCase();
+                    return this.docentes.filter(doc => {
+                        return doc.nombre.toLowerCase().includes(lowerQuery) ||
+                               doc.ci.toLowerCase().includes(lowerQuery) ||
+                               doc.profesion.toLowerCase().includes(lowerQuery) ||
+                               doc.estado.toLowerCase().includes(lowerQuery);
+                    });
+                },
+
                 get tituloReporte() {
-                    if (this.searchQuery === '') return "Listado General de Estudiantes";
-                    return `Reporte Filtrado: "${this.searchQuery.toUpperCase()}"`;
+                    let base = this.currentType === 'docentes' ? 'Listado General de Docentes' : 'Listado General de Estudiantes';
+                    if (this.searchQuery === '') return base;
+                    return `Reporte Filtrado (${this.currentType}): "${this.searchQuery.toUpperCase()}"`;
                 },
 
                 exportPDF() {
                     const element = document.getElementById('reporte-contenedor');
                     const opt = {
                         margin:       0.5,
-                        filename:     'Reporte_Administrativo.pdf',
+                        filename:     `Reporte_${this.currentType.toUpperCase()}.pdf`,
                         image:        { type: 'jpeg', quality: 0.98 },
                         html2canvas:  { scale: 2 },
                         jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
@@ -244,20 +316,27 @@
 
                 exportCSV() {
                     let csvContent = "data:text/csv;charset=utf-8,";
-                    // Encabezados
-                    csvContent += "CI,Nombre,Email,Grupo,Estado_Documentos,Promedio,Estado_Notas\n";
                     
-                    this.filteredEstudiantes.forEach(est => {
-                        // Limpiar comas en el nombre
-                        let nom = est.nombre.replace(/,/g, '');
-                        let row = `${est.ci},${nom},${est.email},${est.grupo},${est.estado_docum},${est.promedio},${est.estado}`;
-                        csvContent += row + "\n";
-                    });
+                    if (this.currentType === 'estudiantes') {
+                        csvContent += "CI,Nombre,Email,Grupo,Estado_Documentos,Promedio,Estado_Notas\n";
+                        this.filteredEstudiantes.forEach(est => {
+                            let nom = est.nombre.replace(/,/g, '');
+                            let row = `${est.ci},${nom},${est.email},${est.grupo},${est.estado_docum},${est.promedio},${est.estado}`;
+                            csvContent += row + "\n";
+                        });
+                    } else {
+                        csvContent += "CI,Nombre,Email,Profesion,Estado\n";
+                        this.filteredDocentes.forEach(doc => {
+                            let nom = doc.nombre.replace(/,/g, '');
+                            let row = `${doc.ci},${nom},${doc.email},${doc.profesion},${doc.estado}`;
+                            csvContent += row + "\n";
+                        });
+                    }
 
                     var encodedUri = encodeURI(csvContent);
                     var link = document.createElement("a");
                     link.setAttribute("href", encodedUri);
-                    link.setAttribute("download", "Reporte_Estudiantes.csv");
+                    link.setAttribute("download", `Reporte_${this.currentType.toUpperCase()}.csv`);
                     document.body.appendChild(link); // Required for FF
                     link.click();
                     document.body.removeChild(link);

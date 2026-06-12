@@ -16,7 +16,10 @@ class GrupoDocente extends Model
         'ciusuario',
         'idmateria',
         'idhorario',
-        'whatsapp_link'
+        'whatsapp_link',
+        'fecha_examen1',
+        'fecha_examen2',
+        'fecha_examen3'
     ];
 
     public function grupo()

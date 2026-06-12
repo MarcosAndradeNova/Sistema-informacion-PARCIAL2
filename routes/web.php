@@ -132,5 +132,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Exámenes y Notas (Admin)
     Route::get('/examenes', [\App\Http\Controllers\Admin\ExamenController::class, 'index'])->name('examenes.index');
-    Route::post('/examenes/update', [\App\Http\Controllers\Admin\ExamenController::class, 'update'])->name('examenes.update');
+    Route::post('/examenes/update-examenes', [\App\Http\Controllers\Admin\ExamenController::class, 'updateExamenes'])->name('examenes.update_examenes');
+    // Roles y Permisos (Admin)
+    Route::get('/roles', [\App\Http\Controllers\Admin\RolesController::class, 'index'])->name('roles.index');
+    Route::post('/roles/{id}', [\App\Http\Controllers\Admin\RolesController::class, 'update'])->name('roles.update');
 });

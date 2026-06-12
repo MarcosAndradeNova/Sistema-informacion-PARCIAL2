@@ -31,57 +31,27 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
+                            @foreach($cronograma as $item)
                             <tr class="hover:bg-blue-50/50 transition-colors">
                                 <td class="px-8 py-5 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">1</div>
+                                        <div class="flex-shrink-0 h-10 w-10 {{ $item->nro_examen == 3 ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-100 text-blue-600' }} rounded-full flex items-center justify-center font-bold">
+                                            {{ $item->nro_examen == 3 ? 'F' : $item->nro_examen }}
+                                        </div>
                                         <div class="ml-4">
-                                            <div class="text-sm font-bold text-gray-900">Primer Examen Parcial</div>
-                                            <div class="text-xs text-gray-500">Evaluación de la primera mitad del temario</div>
+                                            <div class="text-sm font-bold text-gray-900">{{ $item->descripcion }}</div>
+                                            <div class="text-xs text-gray-500">Evaluación oficial programada</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-8 py-5 whitespace-nowrap">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                        Semana 2 de clases
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {{ $item->nro_examen == 3 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                        {{ \Carbon\Carbon::parse($item->fecha)->format('d/m/Y') }}
                                     </span>
                                 </td>
-                                <td class="px-8 py-5 whitespace-nowrap text-sm font-medium text-gray-600">Presencial (Laboratorios)</td>
+                                <td class="px-8 py-5 whitespace-nowrap text-sm font-medium text-gray-600">Aula: <span class="font-bold text-indigo-600">{{ $item->aula }}</span></td>
                             </tr>
-                            <tr class="hover:bg-blue-50/50 transition-colors">
-                                <td class="px-8 py-5 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">2</div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-bold text-gray-900">Segundo Examen Parcial</div>
-                                            <div class="text-xs text-gray-500">Evaluación de la segunda mitad del temario</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-5 whitespace-nowrap">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                        Semana 4 de clases
-                                    </span>
-                                </td>
-                                <td class="px-8 py-5 whitespace-nowrap text-sm font-medium text-gray-600">Presencial (Laboratorios)</td>
-                            </tr>
-                            <tr class="hover:bg-blue-50/50 transition-colors">
-                                <td class="px-8 py-5 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold">F</div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-bold text-gray-900">Examen Final de Admisión</div>
-                                            <div class="text-xs text-gray-500">Evaluación global de conocimientos</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-5 whitespace-nowrap">
-                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                        Semana 6 de clases
-                                    </span>
-                                </td>
-                                <td class="px-8 py-5 whitespace-nowrap text-sm font-medium text-gray-600">Presencial en Facultades</td>
-                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

@@ -45,7 +45,19 @@ class ReporteController extends Controller
             ];
         }
 
-        return view('admin.reportes.index', compact('estudiantesData'));
+        $docentes = \App\Models\Docente::with('usuario')->get();
+        $docentesData = [];
+        foreach ($docentes as $d) {
+            $docentesData[] = [
+                'ci' => $d->ciusuario,
+                'nombre' => trim(($d->usuario->apellidopat ?? '') . ' ' . ($d->usuario->apellidomat ?? '') . ' ' . ($d->usuario->nombre ?? '')),
+                'email' => $d->usuario->email ?? '',
+                'profesion' => $d->profesion ?? 'No Especificada',
+                'estado' => $d->estado ?? 'PENDIENTE'
+            ];
+        }
+
+        return view('admin.reportes.index', compact('estudiantesData', 'docentesData'));
     }
 
     public function exportCsv(Request $request)
