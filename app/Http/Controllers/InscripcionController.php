@@ -10,6 +10,7 @@ use App\Models\Inscribe;
 use App\Models\Carrera;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class InscripcionController extends Controller
 {

@@ -17,17 +17,17 @@ class CarreraSeeder extends Seeder
     {
         // Limpiar la tabla si es necesario o ignorar duplicados
         $carreras = [
-            ['codigo' => 'SIS', 'nombre' => 'Ingeniería en Sistemas'],
-            ['codigo' => 'INF', 'nombre' => 'Ingeniería Informática'],
-            ['codigo' => 'RED', 'nombre' => 'Ingeniería en Redes'],
-            ['codigo' => 'ROB', 'nombre' => 'Ingeniería en Robótica'],
+            ['codigo' => 'SIS', 'nombre' => 'Ingeniería en Sistemas', 'estado' => 'HABILITADO'],
+            ['codigo' => 'INF', 'nombre' => 'Ingeniería Informática', 'estado' => 'HABILITADO'],
+            ['codigo' => 'RED', 'nombre' => 'Ingeniería en Redes', 'estado' => 'HABILITADO'],
+            ['codigo' => 'ROB', 'nombre' => 'Ingeniería en Robótica', 'estado' => 'HABILITADO'],
         ];
 
         foreach ($carreras as $carrera) {
             // Usamos updateOrCreate para evitar duplicados si ya existen
             Carrera::updateOrCreate(
                 ['codigo' => $carrera['codigo']],
-                ['nombre' => $carrera['nombre']]
+                ['nombre' => $carrera['nombre'], 'estado' => $carrera['estado']]
             );
         }
     }

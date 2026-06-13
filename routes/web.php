@@ -287,6 +287,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/postulantes/{ci}/rechazar', [\App\Http\Controllers\AdminController::class, 'rechazarDocumentos'])->name('postulantes.rechazar');
     Route::post('/postulantes/{ci}/enviar-pago', [\App\Http\Controllers\AdminController::class, 'enviarEnlacePago'])->name('postulantes.enviar_pago');
 
+
     // Carreras
     Route::get('/carreras', [\App\Http\Controllers\Admin\CarreraController::class, 'index'])->name('carreras.index');
     Route::post('/carreras', [\App\Http\Controllers\Admin\CarreraController::class, 'update'])->name('carreras.update');
@@ -342,3 +343,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/roles', [\App\Http\Controllers\Admin\RolesController::class, 'index'])->name('roles.index');
     Route::post('/roles/{id}', [\App\Http\Controllers\Admin\RolesController::class, 'update'])->name('roles.update');
 });
+

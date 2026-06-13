@@ -13,10 +13,10 @@ class MateriaSeeder extends Seeder
     public function run(): void
     {
         $materias = [
-            ['nombre' => 'Matemáticas', 'puntos' => 25],
-            ['nombre' => 'Física', 'puntos' => 25],
-            ['nombre' => 'Inglés', 'puntos' => 25],
-            ['nombre' => 'Computación', 'puntos' => 25],
+            ['nombre' => 'Matemáticas', 'estado' => 'HABILITADO'],
+            ['nombre' => 'Física', 'estado' => 'HABILITADO'],
+            ['nombre' => 'Inglés', 'estado' => 'HABILITADO'],
+            ['nombre' => 'Computación', 'estado' => 'HABILITADO'],
         ];
 
         foreach ($materias as $materia) {

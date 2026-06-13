@@ -11,29 +11,41 @@ class MateriaController extends Controller
     // Muestra la vista con la lista de materias configuradas
     public function index()
     {
-        $materias = Materia::orderBy('id')->get();
+        $materias = Materia::orderBy('id')->get()->map(function ($materia) {
+            $materia->estado = $materia->estado ?? 'HABILITADO';
+            return $materia;
+        });
+
         return view('examenes.configuracion', compact('materias'));
     }
 
     public function update(Request $request)
     {
+        $action = $request->input('action', 'update_weights');
+
+        if ($action === 'create') {
+            $data = $request->validate([
+                'nombre' => 'required|string|max:100|unique:materia,nombre',
+                'estado' => 'required|in:HABILITADO,INHABILITADO',
+            ]);
+
+            Materia::create([
+                'nombre' => $data['nombre'],
+                'estado' => $data['estado'],
+            ]);
+
+            return redirect()->route('examenes.puntos')->with('success', 'Materia creada correctamente.');
+        }
+
         $data = $request->validate([
-            'puntos' => 'required|array',
-            'puntos.*' => 'required|integer|min:0|max:100',
+            'estado' => 'required|array',
+            'estado.*' => 'required|in:HABILITADO,INHABILITADO',
         ]);
 
-        $suma = array_sum($data['puntos']);
-
-        // Validamos que la suma total de puntos sea exactamente 100
-        if ($suma !== 100) {
-            return back()->with('error', 'La suma de los puntos de todas las materias debe ser exactamente 100. La suma actual es ' . $suma . '.');
+        foreach ($data['estado'] as $id => $estado) {
+            Materia::where('id', $id)->update(['estado' => $estado]);
         }
 
-        // Actualizamos los puntos de cada materia en la base
-        foreach ($data['puntos'] as $id => $puntos) {
-            Materia::where('id', $id)->update(['puntos' => $puntos]);
-        }
-
-        return back()->with('success', 'Asignación de puntos actualizada correctamente.');
+        return redirect()->route('examenes.puntos')->with('success', 'Materias actualizadas correctamente.');
     }
 }

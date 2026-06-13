@@ -10,6 +10,7 @@ use App\Models\Grupo;
 use App\Models\Materia;
 use App\Models\Calificacion;
 use App\Models\Configuracion;
+use Illuminate\Validation\Rule;
 
 class DocenteDashboardController extends Controller
 {
@@ -22,6 +23,7 @@ class DocenteDashboardController extends Controller
     {
         $docente = $this->getDocente();
         $materias = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                           ->where('materia.estado', 'HABILITADO')
                            ->where('grupodocente.ciusuario', $docente->ci)
                            ->select('materia.*')
                            ->distinct()
@@ -34,6 +36,7 @@ class DocenteDashboardController extends Controller
     {
         $docente = $this->getDocente();
         $materia = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                          ->where('materia.estado', 'HABILITADO')
                           ->where('materia.id', $id)
                           ->where('grupodocente.ciusuario', $docente->ci)
                           ->select('materia.*')
@@ -160,6 +163,7 @@ class DocenteDashboardController extends Controller
     {
         $docente = $this->getDocente();
         $materias = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                           ->where('materia.estado', 'HABILITADO')
                            ->where('grupodocente.ciusuario', $docente->ci)
                            ->select('materia.*')
                            ->distinct()
@@ -172,6 +176,7 @@ class DocenteDashboardController extends Controller
 
         if ($request->has('materia_id')) {
             $materiaSeleccionada = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                                          ->where('materia.estado', 'HABILITADO')
                                           ->where('materia.id', $request->materia_id)
                                           ->where('grupodocente.ciusuario', $docente->ci)
                                           ->select('materia.*')
@@ -227,12 +232,13 @@ class DocenteDashboardController extends Controller
         }
 
         $request->validate([
-            'materia_id' => 'required|exists:materia,id',
+            'materia_id' => ['required', Rule::exists('materia', 'id')->where('estado', 'HABILITADO')],
             'notas' => 'required|array'
         ]);
 
         $docente = $this->getDocente();
         $materia = Materia::join('grupodocente', 'materia.id', '=', 'grupodocente.idmateria')
+                          ->where('materia.estado', 'HABILITADO')
                           ->where('materia.id', $request->materia_id)
                           ->where('grupodocente.ciusuario', $docente->ci)
                           ->select('materia.*')
