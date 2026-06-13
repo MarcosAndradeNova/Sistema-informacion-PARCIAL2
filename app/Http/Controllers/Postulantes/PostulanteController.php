@@ -36,7 +36,7 @@ class PostulanteController extends Controller
 
     public function create()
     {
-        $carreras = Carrera::all();
+        $carreras = Carrera::where('estado', 'HABILITADO')->orderBy('nombre')->get();
         return view('postulantes.create', compact('carreras'));
     }
 
@@ -74,7 +74,7 @@ class PostulanteController extends Controller
     public function edit($ci)
     {
         $postulante = Postulante::with('usuario')->findOrFail($ci);
-        $carreras = Carrera::all();
+        $carreras = Carrera::where('estado', 'HABILITADO')->orderBy('nombre')->get();
         return view('postulantes.edit', compact('postulante', 'carreras'));
     }
 

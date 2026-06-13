@@ -10,6 +10,7 @@ use App\Models\Inscribe;
 use App\Models\Carrera;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class InscripcionController extends Controller
 {
@@ -26,7 +27,7 @@ class InscripcionController extends Controller
             return redirect()->route('inscripcion.estado');
         }
 
-        $carreras = Carrera::all();
+        $carreras = Carrera::where('estado', 'HABILITADO')->orderBy('nombre')->get();
         return view('inscripcion.formulario', compact('carreras'));
     }
 
@@ -51,8 +52,15 @@ class InscripcionController extends Controller
             'rude' => 'nullable|string|max:50',
             'titulobachiller' => 'required|string|max:50',
             
-            'carrera_primera_opcion' => 'required|exists:carrera,codigo',
-            'carrera_segunda_opcion' => 'required|different:carrera_primera_opcion|exists:carrera,codigo',
+            'carrera_primera_opcion' => [
+                'required',
+                Rule::exists('carrera', 'codigo')->where('estado', 'HABILITADO'),
+            ],
+            'carrera_segunda_opcion' => [
+                'required',
+                'different:carrera_primera_opcion',
+                Rule::exists('carrera', 'codigo')->where('estado', 'HABILITADO'),
+            ],
         ], [
             'carrera_segunda_opcion.different' => 'La segunda opción debe ser una carrera distinta a la primera.',
         ]);

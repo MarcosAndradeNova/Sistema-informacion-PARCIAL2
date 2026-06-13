@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Models\Materia;
+use Illuminate\Validation\Rule;
 
 class DocenteController extends Controller
 {
     public function index()
     {
         $docentes = Usuario::where('tipo', 'D')->get();
-        $materias = Materia::orderBy('nombre')->get();
+        $materias = Materia::where('estado', 'HABILITADO')->orderBy('nombre')->get();
         
         return view('admin.docentes.index', compact('docentes', 'materias'));
     }
@@ -136,7 +137,7 @@ class DocenteController extends Controller
         $usuario = \App\Models\Usuario::where('ci', $ci)->firstOrFail();
         $docente = \App\Models\Docente::where('ciusuario', $ci)->firstOrFail();
         
-        $materias = \App\Models\Materia::orderBy('nombre')->get();
+        $materias = \App\Models\Materia::where('estado', 'HABILITADO')->orderBy('nombre')->get();
         $grupos = \App\Models\Grupo::orderBy('codigo')->get();
         $horarios = \Illuminate\Support\Facades\DB::table('horario')->get();
         
@@ -153,7 +154,7 @@ class DocenteController extends Controller
     public function asignarMateria(Request $request, $ci)
     {
         $request->validate([
-            'materia_id' => 'required|exists:materia,id',
+            'materia_id' => ['required', Rule::exists('materia', 'id')->where('estado', 'HABILITADO')],
             'grupo_codigo' => 'required|exists:grupo,codigo',
             'horario_id' => 'required|exists:horario,id',
         ]);

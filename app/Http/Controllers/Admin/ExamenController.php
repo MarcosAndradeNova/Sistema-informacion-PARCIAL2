@@ -9,12 +9,13 @@ use App\Models\Grupo;
 use App\Models\Postulante;
 use App\Models\ResultadoExam;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ExamenController extends Controller
 {
     public function index(Request $request)
     {
-        $materias = Materia::all();
+        $materias = Materia::where('estado', 'HABILITADO')->orderBy('nombre')->get();
         $grupos = Grupo::all();
 
         $materiaSeleccionada = null;
@@ -23,7 +24,7 @@ class ExamenController extends Controller
         $calificacionesMap = [];
 
         if ($request->has('materia_id') && $request->has('grupo_id')) {
-            $materiaSeleccionada = Materia::find($request->materia_id);
+            $materiaSeleccionada = Materia::where('estado', 'HABILITADO')->find($request->materia_id);
             $grupoSeleccionado = Grupo::where('codigo', $request->grupo_id)->first();
 
             if ($materiaSeleccionada && $grupoSeleccionado) {
@@ -63,7 +64,7 @@ class ExamenController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'materia_id' => 'required|exists:materia,id',
+            'materia_id' => ['required', Rule::exists('materia', 'id')->where('estado', 'HABILITADO')],
             'grupo_id' => 'required|exists:grupo,codigo',
             'notas' => 'required|array'
         ]);

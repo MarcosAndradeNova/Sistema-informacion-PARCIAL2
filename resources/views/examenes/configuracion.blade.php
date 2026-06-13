@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-            {{ __('Configuración de Materias y Puntos') }}
+            {{ __('Gestionar Materias') }}
         </h2>
     </x-slot>
 
@@ -10,9 +10,14 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100">
                 <div class="p-8 lg:p-12">
                     
-                    <div class="mb-8">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Asignación de Puntos</h3>
-                        <p class="text-gray-500">Configura cuántos puntos valdrá cada materia en el examen de admisión. La suma de todas las materias debe ser exactamente 100.</p>
+                    <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Gestión de materias</h3>
+                            <p class="text-gray-500">Habilita, inhabilita y crea materias para la gestión actual.</p>
+                        </div>
+                        <button type="button" id="toggle-edit" class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700">
+                            Editar materias
+                        </button>
                     </div>
 
                     @if(session('success'))
@@ -51,93 +56,116 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('examenes.puntos.update') }}" id="puntos-form">
-                        @csrf
-                        
-                        <div class="space-y-6">
-                            @foreach($materias as $materia)
-                                <div class="flex items-center justify-between p-5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors duration-200 group">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
-                                            <span class="text-indigo-600 font-bold text-lg">{{ substr($materia->nombre, 0, 1) }}</span>
-                                        </div>
-                                        <div>
-                                            <label for="materia_{{ $materia->id }}" class="block text-sm font-semibold text-gray-900">{{ $materia->nombre }}</label>
-                                            <p class="text-xs text-gray-500">Puntos máximos permitidos en el examen</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="relative flex items-center w-32">
-                                        <input type="number" 
-                                               id="materia_{{ $materia->id }}" 
-                                               name="puntos[{{ $materia->id }}]" 
-                                               value="{{ old('puntos.'.$materia->id, $materia->puntos) }}"
-                                               min="0" max="100"
-                                               class="puntos-input block w-full rounded-lg border-gray-300 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-medium text-gray-900 shadow-sm"
-                                               required>
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                            <span class="text-gray-500 sm:text-sm">pts</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
+                    <div id="summary-section" class="space-y-4">
+                        <div class="overflow-x-auto rounded-2xl border border-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Materia</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($materias as $materia)
+                                        @if($materia->estado === 'HABILITADO')
+                                            <tr>
+                                                <td class="px-6 py-4 text-sm text-gray-500">{{ $materia->id }}</td>
+                                                <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ $materia->nombre }}</td>
+                                                <td class="px-6 py-4 text-sm">
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">HABILITADO</span>
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
+                    </div>
 
-                        <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between">
-                            <div class="flex items-center mb-4 sm:mb-0 bg-gray-100 px-4 py-3 rounded-lg w-full sm:w-auto justify-between sm:justify-start space-x-4">
-                                <span class="text-sm font-medium text-gray-600">Total asignado:</span>
-                                <div class="flex items-baseline space-x-1">
-                                    <span id="total-puntos" class="text-2xl font-black text-indigo-600">0</span>
-                                    <span class="text-sm font-medium text-gray-500">/ 100</span>
+                    <div id="edit-section" class="hidden mt-10 space-y-10">
+                        <form method="POST" action="{{ route('examenes.puntos.update') }}" class="space-y-8">
+                            @csrf
+                            <input type="hidden" name="action" value="update_weights">
+
+                            <div class="overflow-x-auto rounded-2xl border border-gray-200">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Materia</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach($materias as $materia)
+                                            <tr>
+                                                <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ $materia->nombre }}</td>
+                                                <td class="px-6 py-4">
+                                                    <select name="estado[{{ $materia->id }}]" class="rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                                                        <option value="HABILITADO" {{ $materia->estado === 'HABILITADO' ? 'selected' : '' }}>HABILITADO</option>
+                                                        <option value="INHABILITADO" {{ $materia->estado === 'INHABILITADO' ? 'selected' : '' }}>INHABILITADO</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex gap-3">
+                                    <button type="button" id="cancel-edit" class="px-5 py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-50">Cancelar</button>
+                                    <button type="submit" class="px-5 py-3 rounded-xl bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700">Guardar cambios</button>
                                 </div>
                             </div>
-                            
-                            <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
-                                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                </svg>
-                                Guardar Configuración
-                            </button>
+                        </form>
+
+                        <div class="pt-8 border-t border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Crear Materia</h3>
+                            <form method="POST" action="{{ route('examenes.puntos.update') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                @csrf
+                                <input type="hidden" name="action" value="create">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                                    <input type="text" name="nombre" value="{{ old('nombre') }}" class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                                    <select name="estado" class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" required>
+                                        <option value="HABILITADO">HABILITADO</option>
+                                        <option value="INHABILITADO">INHABILITADO</option>
+                                    </select>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button type="submit" class="w-full px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700">Crear Materia</button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Script para sumar en tiempo real -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('.puntos-input');
-            const totalSpan = document.getElementById('total-puntos');
-            
-            function updateTotal() {
-                let sum = 0;
-                inputs.forEach(input => {
-                    const val = parseInt(input.value) || 0;
-                    sum += val;
-                });
-                
-                totalSpan.textContent = sum;
-                
-                if (sum === 100) {
-                    totalSpan.classList.remove('text-red-500', 'text-indigo-600');
-                    totalSpan.classList.add('text-green-500');
-                } else if (sum > 100) {
-                    totalSpan.classList.remove('text-green-500', 'text-indigo-600');
-                    totalSpan.classList.add('text-red-500');
-                } else {
-                    totalSpan.classList.remove('text-green-500', 'text-red-500');
-                    totalSpan.classList.add('text-indigo-600');
-                }
-            }
-            
-            inputs.forEach(input => {
-                input.addEventListener('input', updateTotal);
-            });
-            
-            // Inicializar al cargar
-            updateTotal();
+        document.addEventListener('DOMContentLoaded', function () {
+            const summarySection = document.getElementById('summary-section');
+            const editSection = document.getElementById('edit-section');
+            const toggleEdit = document.getElementById('toggle-edit');
+            const cancelEdit = document.getElementById('cancel-edit');
+
+            const openEdit = () => {
+                summarySection.classList.add('hidden');
+                editSection.classList.remove('hidden');
+            };
+
+            const closeEdit = () => {
+                editSection.classList.add('hidden');
+                summarySection.classList.remove('hidden');
+            };
+
+            toggleEdit?.addEventListener('click', openEdit);
+            cancelEdit?.addEventListener('click', closeEdit);
         });
     </script>
 </x-app-layout>

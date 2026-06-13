@@ -99,6 +99,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/postulantes/{ci}/aprobar', [\App\Http\Controllers\AdminController::class, 'aprobarDocumentos'])->name('postulantes.aprobar');
     Route::post('/postulantes/{ci}/rechazar', [\App\Http\Controllers\AdminController::class, 'rechazarDocumentos'])->name('postulantes.rechazar');
 
+
     // Carreras
     Route::get('/carreras', [\App\Http\Controllers\Admin\CarreraController::class, 'index'])->name('carreras.index');
     Route::post('/carreras', [\App\Http\Controllers\Admin\CarreraController::class, 'update'])->name('carreras.update');
@@ -134,3 +135,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/examenes', [\App\Http\Controllers\Admin\ExamenController::class, 'index'])->name('examenes.index');
     Route::post('/examenes/update', [\App\Http\Controllers\Admin\ExamenController::class, 'update'])->name('examenes.update');
 });
+

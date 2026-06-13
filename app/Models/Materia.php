@@ -11,6 +11,6 @@ class Materia extends Model
 
     protected $fillable = [
         'nombre',
-        'puntos'
+        'estado'
     ];
 }

@@ -241,7 +241,7 @@ class EstudianteDashboardController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $materias = Materia::all();
+        $materias = Materia::where('estado', 'HABILITADO')->orderBy('nombre')->get();
         
         return view('estudiante.mis_materias', compact('materias'));
     }

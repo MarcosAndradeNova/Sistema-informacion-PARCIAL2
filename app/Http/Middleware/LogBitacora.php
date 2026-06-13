@@ -66,7 +66,6 @@ class LogBitacora
         
         $partes = explode('/', $ruta);
         $modulo = isset($partes[1]) ? $partes[1] : $partes[0];
-
         $operacion = 'Realizó una acción en';
         
         if ($metodo === 'POST') {

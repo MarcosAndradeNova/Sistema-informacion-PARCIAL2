@@ -18,6 +18,7 @@ class CarreraController extends Controller
                 ->where('codigocarre', $carrera->codigo)
                 ->first();
                 
+            $carrera->estado = $carrera->estado ?? 'HABILITADO';
             $carrera->cupo = $ofrece ? $ofrece->cupo : 0;
             if ($ofrece) {
                 $semestreObj = \Illuminate\Support\Facades\DB::table('semestre')->where('id', $ofrece->idsemestre)->first();
@@ -31,14 +32,46 @@ class CarreraController extends Controller
 
     public function update(Request $request)
     {
+        $action = $request->input('action', 'update');
+
+        if ($action === 'create') {
+            $data = $request->validate([
+                'codigo' => 'required|string|max:20|unique:carrera,codigo',
+                'nombre' => 'required|string|max:150',
+                'estado' => 'required|in:HABILITADO,INHABILITADO',
+            ]);
+
+            Carrera::create([
+                'codigo' => strtoupper(trim($data['codigo'])),
+                'nombre' => $data['nombre'],
+                'estado' => $data['estado'],
+            ]);
+
+            // Crea registro base en ofrece para mostrar cupo/gestion en la tabla.
+            if (!\Illuminate\Support\Facades\DB::table('ofrece')->where('codigocarre', strtoupper(trim($data['codigo'])))->exists()) {
+                \Illuminate\Support\Facades\DB::table('ofrece')->insert([
+                    'codigocarre' => strtoupper(trim($data['codigo'])),
+                    'idsemestre' => 1,
+                    'cupo' => 0,
+                ]);
+            }
+
+            return redirect()->route('admin.carreras.index')->with('success', 'Carrera creada correctamente.');
+        }
+
         $data = $request->validate([
             'carreras' => 'required|array',
+            'carreras.*.estado' => 'required|in:HABILITADO,INHABILITADO',
             'carreras.*.cupo' => 'required|integer|min:0',
             'carreras.*.semestre' => 'required|string|max:20',
         ]);
 
         // Itera y actualiza cupos y semestres de cada carrera
         foreach ($data['carreras'] as $codigo => $carreraData) {
+            Carrera::where('codigo', $codigo)->update([
+                'estado' => $carreraData['estado'],
+            ]);
+
             // Buscamos si existe un registro en 'ofrece'
             $existe = \Illuminate\Support\Facades\DB::table('ofrece')
                 ->where('codigocarre', $codigo)
@@ -60,6 +93,6 @@ class CarreraController extends Controller
             }
         }
 
-        return back()->with('success', 'Cupos y semestres actualizados correctamente.');
+        return back()->with('success', 'Carreras actualizadas correctamente.');
     }
 }
