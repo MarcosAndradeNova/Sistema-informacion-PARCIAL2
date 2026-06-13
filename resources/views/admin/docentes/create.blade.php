@@ -78,6 +78,19 @@
                                 <input type="number" name="experiencia" value="{{ old('experiencia', 0) }}" required min="0" class="mt-1 border-gray-300 rounded-md shadow-sm w-full focus:ring-indigo-500 focus:border-indigo-500">
                                 @error('experiencia') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
+
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Materias que puede impartir</label>
+                                <div class="grid grid-cols-2 gap-4 border p-4 rounded-md bg-gray-50">
+                                    @foreach($materias as $materia)
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" name="materias[]" value="{{ $materia->id }}" class="form-checkbox text-indigo-600" {{ (is_array(old('materias')) && in_array($materia->id, old('materias'))) ? 'checked' : '' }}>
+                                            <span class="ml-2">{{ $materia->nombre }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                @error('materias') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
                         <div class="flex justify-end space-x-3 mt-8 pt-4 border-t border-gray-200">

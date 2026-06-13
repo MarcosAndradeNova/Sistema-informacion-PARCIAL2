@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12 bg-gray-100 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <div class="bg-white shadow-sm border border-gray-200">
                 <div class="px-6 py-4 border-b border-gray-200 bg-slate-800 flex items-center justify-between">
@@ -32,67 +32,60 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Etapa de Evaluación</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Periodo Programado</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Modalidad / Ubicación</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-8 w-8 border border-gray-300 bg-gray-100 text-gray-700 rounded-sm flex items-center justify-center font-bold">1</div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-bold text-gray-900 uppercase">Primer Examen Parcial</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold bg-gray-100 text-gray-800 border border-gray-300">
-                                        Semana 2 de clases
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 uppercase">Presencial (Aulas designadas)</td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-8 w-8 border border-gray-300 bg-gray-100 text-gray-700 rounded-sm flex items-center justify-center font-bold">2</div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-bold text-gray-900 uppercase">Segundo Examen Parcial</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold bg-gray-100 text-gray-800 border border-gray-300">
-                                        Semana 4 de clases
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 uppercase">Presencial (Aulas designadas)</td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-8 w-8 border border-gray-300 bg-gray-800 text-white rounded-sm flex items-center justify-center font-bold">F</div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-bold text-gray-900 uppercase">Examen Final de Admisión</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold bg-red-50 text-red-700 border border-red-200">
-                                        Semana 6 de clases
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 uppercase font-medium">Presencial (Auditorio Principal)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                @if($gruposDocente->isEmpty())
+                    <div class="p-10 text-center bg-white border-b border-gray-200">
+                        <p class="text-gray-500 text-sm">No tiene materias/grupos asignados en este periodo.</p>
+                    </div>
+                @else
+                    @foreach($gruposDocente as $grupo)
+                    <div class="bg-slate-50 border-b border-gray-200 px-6 py-3">
+                        <h4 class="text-md font-bold text-slate-800 uppercase">{{ $grupo->materia_nombre }} - Grupo {{ $grupo->codigogrupo }}</h4>
+                    </div>
+                    <div class="overflow-x-auto border-b border-gray-200 mb-4">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Etapa de Evaluación</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Fecha Programada</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Modalidad / Ubicación</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($examenes as $examen)
+                                    @php
+                                        $fechaCampo = 'fecha_examen' . $examen->nro;
+                                        $fecha = $grupo->$fechaCampo;
+                                    @endphp
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-8 w-8 border border-gray-300 {{ $examen->nro == 3 ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700' }} rounded-sm flex items-center justify-center font-bold">
+                                                    {{ $examen->nro == 3 ? 'F' : $examen->nro }}
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-bold text-gray-900 uppercase">{{ $examen->descripcion }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($fecha)
+                                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold bg-blue-50 text-blue-700 border border-blue-200 rounded-md shadow-sm">
+                                                    {{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }}
+                                                </span>
+                                            @else
+                                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-md shadow-sm">
+                                                    Por definir
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 uppercase">Presencial (Aulas designadas)</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endforeach
+                @endif
             </div>
 
         </div>

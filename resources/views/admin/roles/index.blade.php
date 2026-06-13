@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12 bg-gray-100 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             
             @if(session('success'))
                 <div class="bg-green-50 border-l-4 border-green-600 text-green-800 p-4 shadow-sm" role="alert">
@@ -51,6 +51,7 @@
                                             $roleColors = [
                                                 'admin' => 'bg-purple-100 text-purple-800 border-purple-200',
                                                 'docente' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                                'coordinador' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
                                                 'estudiante' => 'bg-green-100 text-green-800 border-green-200',
                                             ];
                                             $colorClass = $roleColors[$user->role] ?? 'bg-gray-100 text-gray-800 border-gray-200';
@@ -63,9 +64,15 @@
                                         <form action="{{ route('admin.roles.update', $user->id) }}" method="POST" class="flex items-center justify-center gap-2">
                                             @csrf
                                             <select name="role" class="text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-                                                <option value="estudiante" {{ $user->role === 'estudiante' ? 'selected' : '' }}>Estudiante</option>
-                                                <option value="docente" {{ $user->role === 'docente' ? 'selected' : '' }}>Docente</option>
-                                                <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Administrador</option>
+                                                @foreach($roles_db as $rol_db)
+                                                    @php
+                                                        $map = ['Postulante' => 'estudiante', 'Admin' => 'admin'];
+                                                        $slug = $map[$rol_db->descripcion] ?? strtolower(str_replace(' ', '_', $rol_db->descripcion));
+                                                    @endphp
+                                                    <option value="{{ $slug }}" {{ $user->role === $slug ? 'selected' : '' }}>
+                                                        {{ $rol_db->descripcion }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 px-3 rounded text-xs shadow-sm transition-colors">
                                                 Actualizar

@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12 bg-gray-50 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             @if (session('success'))
                 <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -62,6 +62,7 @@
                 </div>
             </div>
 
+            @if(Auth::user()->role === 'admin')
             <!-- Formulario de Creación de Grupo -->
             <div class="bg-white p-6 rounded-xl shadow-sm mb-8 flex justify-between items-center border border-gray-200">
                 <div>
@@ -84,6 +85,7 @@
                     </button>
                 </form>
             </div>
+            @endif
 
             <!-- Lista de Grupos -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -128,8 +130,10 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                             <a href="{{ route('admin.grupos.show', $grupo->codigo) }}" class="text-indigo-600 hover:text-indigo-900 font-bold">Detalles</a>
+                                            @if(Auth::user()->role === 'admin')
                                             <span class="text-gray-300">|</span>
                                             <a href="{{ route('admin.grupos.edit', $grupo->codigo) }}" class="text-blue-600 hover:text-blue-900 font-bold">Editar</a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

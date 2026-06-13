@@ -9,6 +9,7 @@ use App\Models\Postulante;
 use App\Models\Grupo;
 use App\Models\Materia;
 use App\Models\Calificacion;
+use App\Models\Configuracion;
 
 class DocenteDashboardController extends Controller
 {
@@ -108,7 +109,51 @@ class DocenteDashboardController extends Controller
 
     public function cronograma()
     {
-        return view('docente.cronograma');
+        $docente = $this->getDocente();
+        $ciDocente = $docente ? $docente->ci : null;
+
+        $gruposDocente = collect();
+        if ($ciDocente) {
+            $gruposDocente = \App\Models\GrupoDocente::where('grupodocente.ciusuario', $ciDocente)
+                ->join('grupo', 'grupodocente.codigogrupo', '=', 'grupo.codigo')
+                ->join('materia', 'grupodocente.idmateria', '=', 'materia.id')
+                ->select('grupodocente.*', 'grupo.nombre as nombre_grupo', 'materia.nombre as materia_nombre')
+                ->get();
+        }
+
+        $examenes = \Illuminate\Support\Facades\DB::table('examen')->get();
+        if ($examenes->isEmpty()) {
+            \Illuminate\Support\Facades\DB::table('examen')->insert([
+                ['nro' => 1, 'descripcion' => 'Primer Parcial', 'fecha' => now()],
+                ['nro' => 2, 'descripcion' => 'Segundo Parcial', 'fecha' => now()],
+                ['nro' => 3, 'descripcion' => 'Examen Final', 'fecha' => now()],
+            ]);
+            $examenes = \Illuminate\Support\Facades\DB::table('examen')->get();
+        }
+
+        return view('docente.cronograma', compact('gruposDocente', 'examenes'));
+    }
+
+    public function miHorario()
+    {
+        $docente = $this->getDocente();
+        $ciDocente = $docente ? $docente->ci : null;
+
+        if (!$ciDocente) {
+            $asignaciones = collect();
+            return view('docente.mi_horario', compact('asignaciones'));
+        }
+
+        $asignaciones = \Illuminate\Support\Facades\DB::table('grupodocente')
+            ->join('materia', 'grupodocente.idmateria', '=', 'materia.id')
+            ->join('horario', 'grupodocente.idhorario', '=', 'horario.id')
+            ->where('ciusuario', $ciDocente)
+            ->select('grupodocente.codigogrupo', 'materia.nombre as materia', 'horario.dia', 'horario.iniciohorario', 'horario.finhorario', 'horario.nroaula')
+            ->orderBy('horario.dia')
+            ->orderBy('horario.iniciohorario')
+            ->get();
+
+        return view('docente.mi_horario', compact('asignaciones'));
     }
 
     public function calificaciones(Request $request)
@@ -164,11 +209,23 @@ class DocenteDashboardController extends Controller
             $examenes = \Illuminate\Support\Facades\DB::table('examen')->get();
         }
 
-        return view('docente.calificaciones', compact('materias', 'materiaSeleccionada', 'estudiantes', 'calificacionesMap', 'examenes', 'codigosGrupos'));
+        $configAbierto = Configuracion::where('clave', 'registro_notas_estado')->value('valor') ?? 'cerrado';
+        $configFin = Configuracion::where('clave', 'registro_notas_fin')->value('valor');
+        $diasRestantes = null;
+        if ($configAbierto == 'abierto' && $configFin) {
+            $diasRestantes = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($configFin), false);
+        }
+
+        return view('docente.calificaciones', compact('materias', 'materiaSeleccionada', 'estudiantes', 'calificacionesMap', 'examenes', 'codigosGrupos', 'configAbierto', 'diasRestantes'));
     }
 
     public function updateCalificaciones(Request $request)
     {
+        $configAbierto = Configuracion::where('clave', 'registro_notas_estado')->value('valor') ?? 'cerrado';
+        if ($configAbierto !== 'abierto') {
+            return redirect()->back()->withErrors('El registro de notas se encuentra cerrado actualmente. No es posible subir ni modificar calificaciones.');
+        }
+
         $request->validate([
             'materia_id' => 'required|exists:materia,id',
             'notas' => 'required|array'

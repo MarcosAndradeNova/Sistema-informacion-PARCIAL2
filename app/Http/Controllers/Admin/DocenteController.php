@@ -19,7 +19,8 @@ class DocenteController extends Controller
 
     public function create()
     {
-        return view('admin.docentes.create');
+        $materias = \App\Models\Materia::orderBy('nombre')->get();
+        return view('admin.docentes.create', compact('materias'));
     }
 
     public function store(Request $request)
@@ -34,6 +35,8 @@ class DocenteController extends Controller
             'profesion' => 'required|string|max:255',
             'nivelformacion' => 'required|string|max:255',
             'experiencia' => 'required|integer|min:0',
+            'materias' => 'required|array|min:1',
+            'materias.*' => 'exists:materia,id',
         ]);
 
         \Illuminate\Support\Facades\DB::beginTransaction();
@@ -60,6 +63,14 @@ class DocenteController extends Controller
                 'estado' => 'APROBADO',
             ]);
 
+            // Guardar preferencias de materias
+            foreach ($request->materias as $materiaId) {
+                \Illuminate\Support\Facades\DB::table('preferenciamat')->insert([
+                    'cidocente' => $usuario->ci,
+                    'idmateria' => $materiaId
+                ]);
+            }
+
             \Illuminate\Support\Facades\DB::commit();
             return redirect()->route('admin.docentes.index')->with('success', 'Docente registrado y aprobado exitosamente.');
         } catch (\Exception $e) {
@@ -72,7 +83,9 @@ class DocenteController extends Controller
     {
         $usuario = \App\Models\Usuario::where('ci', $ci)->firstOrFail();
         $docente = \App\Models\Docente::where('ciusuario', $ci)->first();
-        return view('admin.docentes.edit', compact('usuario', 'docente'));
+        $materias = \App\Models\Materia::orderBy('nombre')->get();
+        $preferencias = \Illuminate\Support\Facades\DB::table('preferenciamat')->where('cidocente', $ci)->pluck('idmateria')->toArray();
+        return view('admin.docentes.edit', compact('usuario', 'docente', 'materias', 'preferencias'));
     }
 
     public function update(Request $request, $ci)
@@ -84,6 +97,8 @@ class DocenteController extends Controller
             'profesion' => 'required|string|max:255',
             'nivelformacion' => 'required|string|max:255',
             'experiencia' => 'required|integer|min:0',
+            'materias' => 'required|array|min:1',
+            'materias.*' => 'exists:materia,id',
         ]);
 
         $usuario = \App\Models\Usuario::where('ci', $ci)->firstOrFail();
@@ -105,6 +120,15 @@ class DocenteController extends Controller
                 'nivelformacion' => $request->nivelformacion,
                 'experiencia' => $request->experiencia,
             ]);
+
+            // Actualizar preferencias de materias
+            \Illuminate\Support\Facades\DB::table('preferenciamat')->where('cidocente', $ci)->delete();
+            foreach ($request->materias as $materiaId) {
+                \Illuminate\Support\Facades\DB::table('preferenciamat')->insert([
+                    'cidocente' => $ci,
+                    'idmateria' => $materiaId
+                ]);
+            }
         }
 
         return redirect()->route('admin.docentes.index')->with('success', 'Información del docente actualizada correctamente.');
@@ -299,8 +323,13 @@ class DocenteController extends Controller
                                 $docenteLibreEncontrado = false;
                                 
                                 foreach ($docentesDisponibles->shuffle() as $docente) {
-                                    // RESTRICCIÓN: El docente debe ser especialista en esta materia
-                                    if ($docente->idmateria !== $materiaActual->id) {
+                                    // RESTRICCIÓN: El docente debe ser capaz de enseñar esta materia (según preferenciamat)
+                                    $puedeEnsenar = \Illuminate\Support\Facades\DB::table('preferenciamat')
+                                        ->where('cidocente', $docente->ciusuario)
+                                        ->where('idmateria', $materiaActual->id)
+                                        ->exists();
+
+                                    if (!$puedeEnsenar) {
                                         continue;
                                     }
 

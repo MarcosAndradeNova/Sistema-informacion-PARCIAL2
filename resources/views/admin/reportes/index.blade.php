@@ -30,7 +30,7 @@
     </style>
 
     <div class="py-12 bg-gray-100 min-h-screen" x-data="reportesApp()">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             
             <!-- Controles Superiores -->
             <div class="bg-white shadow-sm border border-gray-200 rounded-xl p-6 no-print">

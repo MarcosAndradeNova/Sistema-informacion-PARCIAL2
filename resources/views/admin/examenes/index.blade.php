@@ -6,12 +6,63 @@
     </x-slot>
 
     <div class="py-12 bg-gray-100 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             
             @if(session('success'))
                 <div class="bg-green-50 border-l-4 border-green-600 text-green-800 p-4 shadow-sm" role="alert">
                     <p class="font-medium">{{ session('success') }}</p>
                 </div>
+            @endif
+
+            @if(Auth::user()->role === 'admin')
+            <!-- Panel de Habilitación de Notas -->
+            <div class="bg-white shadow-sm border border-gray-200 rounded-lg p-6 mb-6">
+                <h3 class="text-lg leading-6 font-bold text-gray-900 mb-4 border-b pb-2">Control de Registro de Notas</h3>
+                
+                @if(isset($configAbierto) && $configAbierto == 'abierto')
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700 font-medium">
+                                    El registro de notas está actualmente <strong>HABILITADO</strong>. 
+                                    @if(isset($diasRestantes) && $diasRestantes >= 0)
+                                        Faltan {{ $diasRestantes }} días teóricos (el cierre se debe hacer manualmente).
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <form action="{{ route('admin.examenes.update_config_notas') }}" method="POST" class="flex items-center gap-4">
+                        @csrf
+                        <input type="hidden" name="accion" value="cerrar">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 transition-colors">
+                            Cerrar Registro Manualmente
+                        </button>
+                    </form>
+                @else
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                        <p class="text-sm text-yellow-700 font-medium">
+                            El registro de notas está <strong>CERRADO</strong>. Los docentes no pueden subir ni modificar calificaciones.
+                        </p>
+                    </div>
+                    <form action="{{ route('admin.examenes.update_config_notas') }}" method="POST" class="flex flex-col md:flex-row items-end gap-4">
+                        @csrf
+                        <input type="hidden" name="accion" value="abrir">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Cantidad de Días a Habilitar</label>
+                            <input type="number" name="dias" min="1" value="7" class="focus:ring-indigo-600 focus:border-indigo-600 block w-full text-sm border-gray-300 rounded-md p-2.5" required>
+                        </div>
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 transition-colors">
+                            Habilitar Registro
+                        </button>
+                    </form>
+                @endif
+            </div>
             @endif
 
             <!-- Selección de Materia y Grupo -->
@@ -39,9 +90,15 @@
                             @endforeach
                         </select>
                     </div>
+                    @if(Auth::user()->role === 'admin')
                     <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 transition-colors">
                         Configurar Fechas
                     </button>
+                    @else
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 transition-colors">
+                        Consultar Fechas
+                    </button>
+                    @endif
                 </form>
             </div>
 
@@ -67,11 +124,13 @@
                             </div>
                             @endforeach
                         </div>
+                        @if(Auth::user()->role === 'admin')
                         <div class="mt-4 flex justify-end">
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-md shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 transition-colors">
                                 Guardar Fechas
                             </button>
                         </div>
+                        @endif
                     </form>
                 </div>
 

@@ -21,8 +21,22 @@ class AdminMiddleware
 
         $usuario = \App\Models\Usuario::where('email', \Illuminate\Support\Facades\Auth::user()->email)->first();
 
-        if (!$usuario || $usuario->tipo !== 'A') {
-            abort(403, 'Acceso denegado. Se requieren permisos de Administrador.');
+        if (!$usuario || !in_array($usuario->tipo, ['A', 'C'])) {
+            abort(403, 'Acceso denegado. Se requieren permisos de Administrador o Coordinador.');
+        }
+
+        if ($usuario->tipo === 'C') {
+            $allowedRoutes = [
+                'admin.grupos.index', 'admin.grupos.show',
+                'admin.evaluaciones.index',
+                'admin.postulantes',
+                'admin.reportes.index',
+                'dashboard'
+            ];
+            
+            if (!in_array($request->route()->getName(), $allowedRoutes)) {
+                abort(403, 'Acceso denegado. El Coordinador solo tiene permisos de lectura en módulos específicos.');
+            }
         }
 
         return $next($request);

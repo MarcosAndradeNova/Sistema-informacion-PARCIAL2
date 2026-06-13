@@ -117,6 +117,23 @@
                         </div>
                     </div>
 
+                    <h4 class="text-lg font-bold text-gray-800 border-b border-gray-200 pb-2 mb-6 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        Especialidad Docente (Materias que puede impartir)
+                    </h4>
+
+                    <div class="mb-8">
+                        <p class="text-sm text-gray-600 mb-4">Seleccione al menos una materia en la que usted esté capacitado para impartir clases en los cursos de pre-universitarios.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-5 border border-gray-200 rounded-lg shadow-sm">
+                            @foreach($materias as $materia)
+                                <label class="inline-flex items-center p-3 border border-gray-100 rounded hover:bg-red-50 transition-colors cursor-pointer">
+                                    <input type="checkbox" name="materias[]" value="{{ $materia->id }}" class="form-checkbox h-5 w-5 text-red-600 border-gray-300 rounded focus:ring focus:ring-red-200 focus:ring-opacity-50" {{ (is_array(old('materias')) && in_array($materia->id, old('materias'))) ? 'checked' : '' }}>
+                                    <span class="ml-3 text-gray-700 font-medium">{{ $materia->nombre }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-8 text-sm text-blue-800 flex items-start">
                         <svg class="w-6 h-6 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <div>

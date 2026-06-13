@@ -8,6 +8,7 @@ use App\Models\Materia;
 use App\Models\Grupo;
 use App\Models\Postulante;
 use App\Models\ResultadoExam;
+use App\Models\Configuracion;
 use Illuminate\Support\Facades\DB;
 
 class ExamenController extends Controller
@@ -45,7 +46,14 @@ class ExamenController extends Controller
             $examenes = DB::table('examen')->get();
         }
 
-        return view('admin.examenes.index', compact('materias', 'grupos', 'materiaSeleccionada', 'grupoSeleccionado', 'examenes', 'grupoDocenteInfo'));
+        $configAbierto = Configuracion::where('clave', 'registro_notas_estado')->value('valor') ?? 'cerrado';
+        $configFin = Configuracion::where('clave', 'registro_notas_fin')->value('valor');
+        $diasRestantes = null;
+        if ($configAbierto == 'abierto' && $configFin) {
+            $diasRestantes = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($configFin), false);
+        }
+
+        return view('admin.examenes.index', compact('materias', 'grupos', 'materiaSeleccionada', 'grupoSeleccionado', 'examenes', 'grupoDocenteInfo', 'configAbierto', 'diasRestantes'));
     }
 
     public function updateExamenes(Request $request)
@@ -88,5 +96,24 @@ class ExamenController extends Controller
         }
 
         return redirect()->route('admin.examenes.index', ['materia_id' => $request->materia_id, 'grupo_id' => $request->grupo_id])->with('success', 'Fechas de exámenes actualizadas exitosamente.');
+    }
+
+    public function updateConfigNotas(Request $request)
+    {
+        $request->validate([
+            'accion' => 'required|in:abrir,cerrar',
+            'dias' => 'nullable|integer|min:1'
+        ]);
+
+        if ($request->accion == 'abrir') {
+            $dias = (int) ($request->dias ?? 7);
+            $fechaFin = now()->addDays($dias);
+            Configuracion::updateOrCreate(['clave' => 'registro_notas_estado'], ['valor' => 'abierto']);
+            Configuracion::updateOrCreate(['clave' => 'registro_notas_fin'], ['valor' => $fechaFin->format('Y-m-d H:i:s')]);
+            return back()->with('success', 'Registro de notas habilitado por ' . $dias . ' días.');
+        } else {
+            Configuracion::updateOrCreate(['clave' => 'registro_notas_estado'], ['valor' => 'cerrado']);
+            return back()->with('success', 'Registro de notas cerrado manualmente.');
+        }
     }
 }

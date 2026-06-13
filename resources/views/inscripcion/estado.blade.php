@@ -143,15 +143,28 @@
                                 </div>
                                 <h3 class="text-2xl font-bold text-gray-900 mb-2">Fase 6: Pago de Matrícula</h3>
                                 <p class="text-gray-600 mb-6 text-lg">
-                                    ¡Excelente! Tus documentos han sido verificados y aprobados. Ahora debes realizar el pago para convertirte oficialmente en postulante.
+                                    ¡Excelente! Tus documentos han sido verificados y aprobados. Se enviará un enlace único de pago a tu correo electrónico para que puedas completar tu matrícula.
                                 </p>
-                                <a href="{{ route('pago.create') }}" class="inline-flex justify-center items-center px-8 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-xl transition-transform transform hover:scale-105">
-                                    Proceder al Pago
-                                    <svg class="ml-2 -mr-1 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                    </svg>
-                                </a>
-                                <p class="mt-4 text-sm text-gray-500">Monto a pagar: Bs. 300.- (Inscripción CUP)</p>
+                                <div class="inline-flex justify-center items-center px-8 py-4 border border-indigo-200 text-lg font-bold rounded-xl text-indigo-700 bg-indigo-50 mb-4">
+                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                    Revisa tu bandeja de entrada
+                                </div>
+
+                                @if($errors->has('pago'))
+                                    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                                        <strong class="font-bold">Aviso:</strong>
+                                        <span class="block sm:inline">{{ $errors->first('pago') }}</span>
+                                    </div>
+                                @endif
+
+                                <form method="POST" action="{{ route('inscripcion.verificar_pago') }}">
+                                    @csrf
+
+                                    <button type="submit" class="inline-flex justify-center items-center px-8 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 shadow-xl transition-transform transform hover:scale-105">
+                                        Verificar Pago
+                                    </button>
+                                </form>
+                                <p class="mt-4 text-sm text-gray-500">Monto a pagar: Bs. 350.- (Inscripción CUP)</p>
                             </div>
 
                         @elseif($postulante->estadodocum == 'INSCRITO')

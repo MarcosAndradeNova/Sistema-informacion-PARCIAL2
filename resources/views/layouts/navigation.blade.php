@@ -45,15 +45,15 @@
 
                     @if($esPostulanteActivo)
                         <x-nav-link :href="route('estudiante.mi_grupo')" :active="request()->routeIs('estudiante.mi_grupo')">
-                            {{ __('Mi Grupo') }}
+                            {{ __('Visualizar Mi Grupo') }}
                         </x-nav-link>
                         
                         <x-nav-link :href="route('estudiante.mis_materias')" :active="request()->routeIs('estudiante.mis_materias')">
-                            {{ __('Mis Materias') }}
+                            {{ __('Visualizar Mis Materias') }}
                         </x-nav-link>
                         
                         <x-nav-link :href="route('estudiante.mis_examenes')" :active="request()->routeIs('estudiante.mis_examenes')">
-                            {{ __('Mis Exámenes') }}
+                            {{ __('Visualizar Exámenes y Notas') }}
                         </x-nav-link>
                     @endif
 
@@ -145,15 +145,15 @@
 
             @if(isset($esPostulanteActivo) && $esPostulanteActivo)
                 <x-responsive-nav-link :href="route('estudiante.mi_grupo')" :active="request()->routeIs('estudiante.mi_grupo')">
-                    {{ __('Mi Grupo') }}
+                    {{ __('Visualizar Mi Grupo') }}
                 </x-responsive-nav-link>
                 
                 <x-responsive-nav-link :href="route('estudiante.mis_materias')" :active="request()->routeIs('estudiante.mis_materias')">
-                    {{ __('Mis Materias') }}
+                    {{ __('Visualizar Mis Materias') }}
                 </x-responsive-nav-link>
                 
                 <x-responsive-nav-link :href="route('estudiante.mis_examenes')" :active="request()->routeIs('estudiante.mis_examenes')">
-                    {{ __('Mis Exámenes') }}
+                    {{ __('Visualizar Exámenes y Notas') }}
                 </x-responsive-nav-link>
             @endif
 

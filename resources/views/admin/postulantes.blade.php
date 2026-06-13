@@ -4,12 +4,12 @@
             <svg class="h-6 w-6 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
-            {{ __('Verificar Documentos') }}
+            {{ Auth::user()->role === 'coordinador' ? __('Consulta de Admisión') : __('Registrar Postulante') }}
         </h2>
     </x-slot>
 
     <div class="py-8 bg-gray-50 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             @if (session('success'))
                 <div class="mb-6 p-4 rounded-xl bg-green-50 border-l-4 border-green-500 flex items-center shadow-sm">
@@ -87,6 +87,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         @if($p->estadodocum == 'PENDIENTE' || $p->estadodocum == 'RECHAZADO')
+                                            @if(Auth::user()->role === 'admin')
                                             <div class="flex justify-end space-x-2">
                                                 <!-- Botón Aprobar -->
                                                 <form action="{{ route('admin.postulantes.aprobar', $p->ciusuario) }}" method="POST">
@@ -101,6 +102,9 @@
                                                     Observar
                                                 </button>
                                             </div>
+                                            @else
+                                            <span class="text-gray-400 italic text-xs">Solo Admin</span>
+                                            @endif
 
                                             <!-- Modal de Rechazo -->
                                             <x-modal name="rechazar-{{ $p->ciusuario }}" focusable>
@@ -125,6 +129,16 @@
                                                     </div>
                                                 </form>
                                             </x-modal>
+                                        @elseif($p->estadodocum == 'APROBADO' && Auth::user()->role === 'admin')
+                                            <form action="{{ route('admin.postulantes.enviar_pago', $p->ciusuario) }}" method="POST" class="inline-block">
+                                                @csrf
+                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-bold rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none" onclick="return confirm('¿Desea generar y enviar el enlace de pago al correo del postulante?')">
+                                                    <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                                    Enviar Enlace Pago
+                                                </button>
+                                            </form>
+                                        @elseif($p->estadodocum == 'INSCRITO')
+                                            <span class="text-gray-500 text-xs italic">Inscrito</span>
                                         @else
                                             <span class="text-gray-400 italic text-xs">Acción completada</span>
                                         @endif

@@ -3,104 +3,133 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Usuario;
 use App\Models\Postulante;
 use App\Models\Postulacion;
-use App\Models\Pago;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
+use App\Models\User;
+use App\Models\Usuario;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CredencialesMail;
 
 class PagoController extends Controller
 {
-    public function create()
+    /**
+     * Muestra la pasarela de pagos simulada usando un enlace firmado.
+     */
+    public function showPasarela(Request $request, $ci)
     {
-        $usuario = Usuario::where('email', Auth::user()->email)->first();
-        if (!$usuario || $usuario->tipo !== 'POSTULANTE') { // 'P' si actualizamos el tipo
-            // Permitir 'P' o 'POSTULANTE'
-            if($usuario->tipo !== 'P' && $usuario->tipo !== 'POSTULANTE') {
-                return redirect()->route('dashboard');
-            }
+        if (!$request->hasValidSignature()) {
+            abort(401, 'El enlace de pago es inválido o ha expirado.');
         }
 
-        $postulante = Postulante::where('ciusuario', $usuario->ci)->first();
-        if (!$postulante || $postulante->estadodocum !== 'APROBADO') {
-            return redirect()->route('inscripcion.estado')->with('error', 'No estás habilitado para realizar el pago en este momento.');
+        $postulante = Postulante::where('ciusuario', $ci)->firstOrFail();
+        $usuario = Usuario::where('ci', $ci)->firstOrFail();
+
+        // Verificar si ya está pagado
+        if ($postulante->estadodocum === 'INSCRITO') {
+            return redirect()->route('login')->with('info', 'El pago ya fue procesado anteriormente.');
         }
 
-        return view('pago.create', compact('usuario', 'postulante'));
+        return view('pago.pasarela', compact('postulante', 'usuario'));
     }
 
-    public function store(Request $request)
+    /**
+     * Procesa el pago y finaliza la inscripción.
+     */
+    public function procesarPago(Request $request, $ci)
     {
-        $request->validate([
-            'metodopago' => 'required|in:QR,TARJETA'
-        ]);
+        $postulante = Postulante::where('ciusuario', $ci)->firstOrFail();
+        $usuario = Usuario::where('ci', $ci)->firstOrFail();
 
-        $usuario = Usuario::where('email', Auth::user()->email)->firstOrFail();
-        $postulante = Postulante::where('ciusuario', $usuario->ci)->firstOrFail();
-        
-        // Verificar que realmente debe pagar
-        if ($postulante->estadodocum !== 'APROBADO') {
-            return redirect()->route('inscripcion.estado')->with('error', 'El pago ya fue procesado o no es requerido.');
-        }
+        // Check if pago already exists
+        $pagoExistente = \App\Models\Pago::where('ciusuario', $ci)->first();
+        if (!$pagoExistente) {
+            DB::transaction(function () use ($postulante, $usuario, $ci) {
+                $nuevoId = \App\Models\Pago::max('id') ?? 0;
+                $nuevoId++;
 
-        // Generar ID manual
-        $nuevoId = Pago::max('id') ?? 0;
-        $nuevoId++;
-
-        // Crear el pago
-        $pago = Pago::create([
-            'id' => $nuevoId,
-            'numerorecibo' => 'REC-' . strtoupper(uniqid()),
-            'monto' => 300.00,
-            'metodopago' => $request->metodopago,
-            'estado' => 'Pagado',
-            'fecha' => now()->toDateString(),
-            'ciusuario' => $usuario->ci
-        ]);
-
-        // Actualizar postulacion
-        $postulacion = Postulacion::where('ciusuario', $usuario->ci)
-                        ->orderBy('codpost', 'desc')
-                        ->first();
-                        
-        if ($postulacion) {
-            $postulacion->idpago = $pago->id;
-            $postulacion->save();
-        }
-
-        // Cambiar estado a INSCRITO
-        $postulante->estadodocum = 'INSCRITO';
-        $postulante->save();
-
-        // Asignación automática de grupo en tiempo real
-        if ($postulacion && is_null($postulacion->codgrupo)) {
-            $grupos = \App\Models\Grupo::all();
-            $grupoDisponible = null;
-            
-            foreach ($grupos as $g) {
-                $cupo = $g->cupo ?? 70;
-                $inscritos = \App\Models\Postulacion::where('codgrupo', $g->codigo)->count();
-                if ($inscritos < $cupo) {
-                    $grupoDisponible = $g;
-                    break;
-                }
-            }
-
-            if (!$grupoDisponible) {
-                $countGrupos = \App\Models\Grupo::count();
-                $nuevoCodigo = 'G' . ($countGrupos + 1);
-                $grupoDisponible = \App\Models\Grupo::create([
-                    'codigo' => $nuevoCodigo,
-                    'nombre' => 'Grupo ' . $nuevoCodigo,
-                    'cupo' => 70,
-                    'idturno' => 1
+                $pagoId = \App\Models\Pago::insertGetId([
+                    'id' => $nuevoId,
+                    'numerorecibo' => 'REC-' . time() . '-' . rand(100, 999),
+                    'monto' => 350.00,
+                    'metodopago' => 'Tarjeta de Crédito/Débito',
+                    'estado' => 'Pagado',
+                    'fecha' => now()->toDateString(),
+                    'ciusuario' => $ci
                 ]);
-            }
 
-            $postulacion->codgrupo = $grupoDisponible->codigo;
-            $postulacion->save();
+                $postulacion = Postulacion::where('ciusuario', $ci)->orderBy('codpost', 'desc')->first();
+                if ($postulacion) {
+                    $postulacion->idpago = $pagoId;
+                    
+                    if (is_null($postulacion->codgrupo)) {
+                        $grupos = \App\Models\Grupo::all();
+                        $grupoDisponible = null;
+                        foreach ($grupos as $g) {
+                            $cupo = $g->cupo ?? 70;
+                            $inscritos = \App\Models\Postulacion::where('codgrupo', $g->codigo)->count();
+                            if ($inscritos < $cupo) {
+                                $grupoDisponible = $g;
+                                break;
+                            }
+                        }
+
+                        if (!$grupoDisponible) {
+                            $countGrupos = \App\Models\Grupo::count();
+                            $nuevoCodigo = 'G' . ($countGrupos + 1);
+                            $grupoDisponible = \App\Models\Grupo::create([
+                                'codigo' => $nuevoCodigo,
+                                'nombre' => 'Grupo ' . $nuevoCodigo,
+                                'cupo' => 70,
+                                'idturno' => 1
+                            ]);
+                        }
+                        $postulacion->codgrupo = $grupoDisponible->codigo;
+                    }
+                    $postulacion->save();
+                }
+
+                $postulante->estadodocum = 'INSCRITO';
+                $postulante->save();
+
+                $user = User::where('email', $usuario->email)->first();
+                if ($user) {
+                    $user->password = Hash::make($ci);
+                    $user->role = 'postulante';
+                    $user->save();
+                }
+
+                try {
+                    DB::table('bitacora')->insert([
+                        'usuario' => $usuario->nombre . ' ' . $usuario->apellidopat,
+                        'accion' => "Inscripción completada en pasarela para CI: $ci.",
+                        'fecha' => now()->toDateString(),
+                        'hora' => now()->toTimeString()
+                    ]);
+                } catch (\Exception $e) {}
+
+                try {
+                    Mail::to($usuario->email)->send(new CredencialesMail($usuario->email, $ci));
+                } catch (\Exception $e) {}
+            });
         }
 
-        return redirect()->route('inscripcion.estado')->with('success', '¡Pago confirmado! Has completado tu inscripción y ahora eres un Postulante Activo.');
+        return redirect()->route('login')->with('success', '¡Felicidades! Tu pago ha sido procesado con éxito y ya eres Postulante Oficial. Inicia sesión para ver tu nuevo panel.');
+    }
+
+    private function logBitacora($accion)
+    {
+        try {
+            DB::table('bitacora')->insert([
+                'usuario' => 'Sistema (Pasarela)',
+                'accion' => $accion,
+                'fecha' => now()->toDateString(),
+                'hora' => now()->toTimeString()
+            ]);
+        } catch (\Exception $e) {
+            // Ignorar si falla la bitácora
+        }
     }
 }

@@ -9,7 +9,7 @@
     </x-slot>
 
     <div class="py-12 bg-gray-50 min-h-screen">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             
             <div class="text-center max-w-2xl mx-auto mb-10">
                 <p class="text-gray-500 text-lg">Prepárate para tu prueba de admisión. Aquí encontrarás las materias que serán evaluadas y el puntaje que cada una aporta a tu calificación final.</p>

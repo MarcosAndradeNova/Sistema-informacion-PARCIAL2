@@ -202,12 +202,18 @@ class EstudianteDashboardController extends Controller
             if (!$postulacion) {
                 // Generar un ID único para la llave primaria
                 $maxId = Postulacion::max('codpost') ?? 0;
+                $admision = \Illuminate\Support\Facades\DB::table('admision')->first();
+                $idAdmision = $admision ? $admision->id : 1; // Default to 1 if no admision exists yet
+                
                 $postulacion = Postulacion::create([
                     'codpost' => $maxId + 1,
                     'fecha' => date('Y-m-d'),
                     'hora' => date('H:i:s'),
                     'ciusuario' => $postulante->ciusuario,
-                    'codgrupo' => $grupoDisponible->codigo
+                    'codgrupo' => $grupoDisponible->codigo,
+                    'idadmision' => $idAdmision,
+                    'codrol' => 3, // Rol de postulante
+                    'idsemestre' => 1 // Semestre por defecto
                 ]);
             } else {
                 $postulacion->codgrupo = $grupoDisponible->codigo;

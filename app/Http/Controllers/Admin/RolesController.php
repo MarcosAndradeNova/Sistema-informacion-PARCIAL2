@@ -23,6 +23,7 @@ class RolesController extends Controller
                 if ($usuario) {
                     if ($usuario->tipo === 'A') $user->role = 'admin';
                     elseif ($usuario->tipo === 'D') $user->role = 'docente';
+                    elseif ($usuario->tipo === 'C') $user->role = 'coordinador';
                     else $user->role = 'estudiante';
                 } else {
                     $user->role = 'estudiante';
@@ -32,13 +33,22 @@ class RolesController extends Controller
             }
         }
 
-        return view('admin.roles.index', compact('users'));
+        // Obtener roles de la base de datos
+        $roles_db = DB::table('rol')->get();
+
+        return view('admin.roles.index', compact('users', 'roles_db'));
     }
 
     public function update(Request $request, $id)
     {
+        $roles_db = DB::table('rol')->get();
+        $valid_roles = $roles_db->map(function($r) {
+            $map = ['Postulante' => 'estudiante', 'Admin' => 'admin'];
+            return $map[$r->descripcion] ?? strtolower(str_replace(' ', '_', $r->descripcion));
+        })->toArray();
+
         $request->validate([
-            'role' => 'required|in:admin,docente,estudiante'
+            'role' => 'required|in:' . implode(',', $valid_roles)
         ]);
 
         $user = User::findOrFail($id);
@@ -81,7 +91,10 @@ class RolesController extends Controller
                         DB::table('docente')->where('ciusuario', $usuario->ci)->update(['estado' => 'APROBADO', 'codrol' => 2]);
                     }
                     
-                } else {
+                } elseif ($request->role === 'coordinador') {
+                    $usuario->tipo = 'C';
+                    
+                } elseif ($request->role === 'estudiante') {
                     $usuario->tipo = 'P';
                     
                     // Insertar en tabla postulante (no usa codrol directo pero le corresponde rol 1)
@@ -92,8 +105,14 @@ class RolesController extends Controller
                             'estadodocum' => 'REGISTRADO'
                         ]);
                     }
+                } else {
+                    // Para roles nuevos, asignar un tipo genérico o dejarlo como estaba si es necesario
+                    $usuario->tipo = 'O'; // O de Otro
                 }
                 $usuario->save();
+            } else {
+                DB::rollBack();
+                return redirect()->route('admin.roles.index')->with('error', "No se puede cambiar el rol de {$user->name} porque no ha completado su registro base (Falta CI). El usuario debe completar su registro primero.");
             }
 
             // Registrar en bitácora

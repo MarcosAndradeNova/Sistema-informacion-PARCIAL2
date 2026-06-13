@@ -62,7 +62,9 @@ class DocenteRegistrationController extends Controller
             return view('docente.pendiente');
         }
 
-        return view('docente.formulario');
+        $materias = \App\Models\Materia::orderBy('nombre')->get();
+
+        return view('docente.formulario', compact('materias'));
     }
 
     /**
@@ -83,6 +85,8 @@ class DocenteRegistrationController extends Controller
             'carrera' => 'required|string|max:100',
             'anios_experiencia' => 'required|integer|min:0',
             'nivel_formacion' => 'required|string|max:50',
+            'materias' => 'required|array|min:1',
+            'materias.*' => 'exists:materia,id',
         ]);
 
         $user = Auth::user();
@@ -117,6 +121,14 @@ class DocenteRegistrationController extends Controller
                 'estado' => 'PENDIENTE',
             ]
         );
+        // Guardar las preferencias de materias
+        \Illuminate\Support\Facades\DB::table('preferenciamat')->where('cidocente', $usuario->ci)->delete();
+        foreach ($request->materias as $materiaId) {
+            \Illuminate\Support\Facades\DB::table('preferenciamat')->insert([
+                'cidocente' => $usuario->ci,
+                'idmateria' => $materiaId
+            ]);
+        }
 
         return redirect()->route('docente.inscripcion.create')->with('success', 'Ficha de Docente completada.');
     }
