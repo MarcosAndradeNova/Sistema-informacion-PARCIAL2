@@ -39,7 +39,7 @@
     $showPersonal = $isAdmin || $isDocenteFicha;
     $showInscripcion = $isAdmin || $isPostulanteFicha || $isCoordinador;
     $showAcademica = $isAdmin || $esPostulanteActivo || $isDocenteAprobado || $isCoordinador;
-    $showEvaluaciones = $esPostulanteActivo || $isDocenteAprobado || $isCoordinador;
+    $showEvaluaciones = $isAdmin || $esPostulanteActivo || $isDocenteAprobado || $isCoordinador;
     $showReportes = $isAdmin || $isCoordinador;
 @endphp
 
@@ -135,10 +135,13 @@
                 </button>
                 <div x-show="open && !collapsed" class="pl-11 space-y-1 mt-1 border-l-2 border-indigo-100 ml-5">
                     @if($isAdmin || $isCoordinador)
-                    <a href="{{ route('admin.postulantes') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.postulantes*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">{{ $isCoordinador ? 'Consulta de Admisión' : 'Registrar Postulante' }}</a>
+                    <a href="{{ route('admin.postulantes.create') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.postulantes.create') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Registrar Postulante</a>
+                    <a href="{{ route('admin.postulantes') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.postulantes') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Verificar Documentos</a>
                     @endif
-                    @if($isPostulanteFicha)
-                    <a href="{{ route('inscripcion.estado') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('inscripcion.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Registrarme como postulante</a>
+                    @if($esPostulanteActivo)
+                    <a href="{{ route('inscripcion.estado') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('inscripcion.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Estado de Admisión</a>
+                    @elseif($tipo === 'P' && $usuario && !$esPostulanteActivo)
+                    <a href="{{ route('inscripcion.estado') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('inscripcion.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Verificar mi Estado</a>
                     @endif
                 </div>
             </div>
@@ -198,8 +201,8 @@
                     </svg>
                 </button>
                 <div x-show="open && !collapsed" class="pl-11 space-y-1 mt-1 border-l-2 border-indigo-100 ml-5">
-                    @if($isCoordinador)
-                    <a href="{{ route('admin.evaluaciones.index') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.evaluaciones.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Consulta de Notas</a>
+                    @if($isAdmin || $isCoordinador)
+                    <a href="{{ route('admin.evaluaciones.index') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.evaluaciones.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Consulta de Notas / Admisión</a>
                     @endif
                     @if($esPostulanteActivo)
                     <a href="{{ route('estudiante.mis_examenes') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('estudiante.mis_examenes') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Visualizar Exámenes y Notas</a>

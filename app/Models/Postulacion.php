@@ -24,7 +24,10 @@ class Postulacion extends Model
         'ciusuario',
         'codrol',
         'codgrupo',
-        'idsemestre'
+        'idsemestre',
+        'promedio',
+        'estado_admision',
+        'carrera_admitida'
     ];
 
     public function grupo()

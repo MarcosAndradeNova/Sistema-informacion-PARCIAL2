@@ -50,7 +50,7 @@ class PagoController extends Controller
                 $nuevoId = \App\Models\Pago::max('id') ?? 0;
                 $nuevoId++;
 
-                $pagoId = \App\Models\Pago::insertGetId([
+                $pago = \App\Models\Pago::create([
                     'id' => $nuevoId,
                     'numerorecibo' => 'REC-' . time() . '-' . rand(100, 999),
                     'monto' => 350.00,
@@ -62,7 +62,7 @@ class PagoController extends Controller
 
                 $postulacion = Postulacion::where('ciusuario', $ci)->orderBy('codpost', 'desc')->first();
                 if ($postulacion) {
-                    $postulacion->idpago = $pagoId;
+                    $postulacion->idpago = $pago->id;
                     
                     if (is_null($postulacion->codgrupo)) {
                         $grupos = \App\Models\Grupo::all();

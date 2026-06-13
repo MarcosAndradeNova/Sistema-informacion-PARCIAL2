@@ -8,6 +8,33 @@
     <div class="py-12 bg-gray-100 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
+            <!-- Panel de Admisión Global -->
+            <div class="bg-white shadow-sm border border-gray-200 rounded-lg p-6 mb-6">
+                <div class="mb-4">
+                    <h3 class="text-lg leading-6 font-bold text-gray-900">Control de Admisiones</h3>
+                    <p class="text-sm text-gray-500">Calcula los promedios globales de todos los postulantes, evalúa los cupos por carrera y genera los resultados finales de admisión.</p>
+                </div>
+                <div class="flex gap-4">
+                    <form action="{{ route('admin.evaluaciones.calcular') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-sm border border-transparent focus:outline-none transition-colors">
+                            Generar Resultados de Admisión
+                        </button>
+                    </form>
+                    <form action="{{ route('admin.evaluaciones.notificar') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-sm border border-transparent focus:outline-none transition-colors">
+                            Notificar Resultados por Correo
+                        </button>
+                    </form>
+                </div>
+                @if(session('success'))
+                    <div class="mt-4 p-4 bg-green-100 text-green-800 rounded-lg font-semibold">
+                        {{ session('success') }}
+                    </div>
+                @endif
+            </div>
+
             <!-- Selección de Materia y Grupo -->
             <div class="bg-white shadow-sm border border-gray-200 rounded-lg p-6">
                 <form action="{{ route('admin.evaluaciones.index') }}" method="GET" class="flex flex-col md:flex-row md:items-end gap-6">

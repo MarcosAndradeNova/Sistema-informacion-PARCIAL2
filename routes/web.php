@@ -174,9 +174,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // Rutas para el flujo principal de inscripción del estudiante
-    Route::get('/inscripcion', [\App\Http\Controllers\InscripcionController::class, 'create'])->name('inscripcion.create');
-    Route::post('/inscripcion', [\App\Http\Controllers\InscripcionController::class, 'store'])->name('inscripcion.store');
+    // Rutas para el flujo principal de inscripción del estudiante (Aisladas al admin ahora)
+    // Route::get('/inscripcion', [\App\Http\Controllers\InscripcionController::class, 'create'])->name('inscripcion.create');
+    // Route::post('/inscripcion', [\App\Http\Controllers\InscripcionController::class, 'store'])->name('inscripcion.store');
+    
     Route::get('/inscripcion/estado', [\App\Http\Controllers\InscripcionController::class, 'estado'])->name('inscripcion.estado');
     Route::post('/inscripcion/verificar-pago', [\App\Http\Controllers\InscripcionController::class, 'verificarPago'])->name('inscripcion.verificar_pago');
     
@@ -280,6 +281,8 @@ Route::get('/debug-force-inscrito', function () {
 // Rutas protegidas exclusivamente para el rol de administrador
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/postulantes', [\App\Http\Controllers\AdminController::class, 'index'])->name('postulantes');
+    Route::get('/postulantes/create', [\App\Http\Controllers\AdminController::class, 'create'])->name('postulantes.create');
+    Route::post('/postulantes', [\App\Http\Controllers\AdminController::class, 'store'])->name('postulantes.store');
     Route::post('/postulantes/{ci}/aprobar', [\App\Http\Controllers\AdminController::class, 'aprobarDocumentos'])->name('postulantes.aprobar');
     Route::post('/postulantes/{ci}/rechazar', [\App\Http\Controllers\AdminController::class, 'rechazarDocumentos'])->name('postulantes.rechazar');
     Route::post('/postulantes/{ci}/enviar-pago', [\App\Http\Controllers\AdminController::class, 'enviarEnlacePago'])->name('postulantes.enviar_pago');
@@ -328,6 +331,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Evaluaciones (Consulta para Coordinador y Admin)
     Route::get('/evaluaciones', [\App\Http\Controllers\Admin\EvaluacionController::class, 'index'])->name('evaluaciones.index');
+    Route::post('/evaluaciones/calcular', [\App\Http\Controllers\Admin\EvaluacionController::class, 'calcular'])->name('evaluaciones.calcular');
+    Route::post('/evaluaciones/notificar', [\App\Http\Controllers\Admin\EvaluacionController::class, 'notificar'])->name('evaluaciones.notificar');
 
     // Exámenes y Notas (Admin)
     Route::get('/examenes', [\App\Http\Controllers\Admin\ExamenController::class, 'index'])->name('examenes.index');

@@ -6,10 +6,10 @@
                 <!-- Header -->
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-center sm:text-left">
                     <h2 class="text-3xl font-extrabold text-white tracking-tight">
-                        Fase 2: Datos del Estudiante
+                        Registro de Postulante
                     </h2>
                     <p class="mt-2 text-blue-100 text-lg">
-                        Completa tu información personal y académica para continuar con tu proceso de admisión al CUP.
+                        Como administrador, completa la información para crear la cuenta y el registro del postulante.
                     </p>
                 </div>
 
@@ -34,7 +34,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('inscripcion.store') }}" method="POST" class="space-y-8">
+                    <form action="{{ route('admin.postulantes.store') }}" method="POST" class="space-y-8">
                         @csrf
 
                         <!-- Sección: Datos Personales -->
@@ -46,6 +46,11 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico *</label>
+                                    <input type="email" name="email" id="email" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('email') }}" placeholder="correo@ejemplo.com">
+                                </div>
+
                                 <div>
                                     <label for="ci" class="block text-sm font-medium text-gray-700">Carnet de Identidad (CI) *</label>
                                     <input type="text" name="ci" id="ci" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ old('ci') }}" placeholder="Ej. 1234567">
@@ -159,7 +164,7 @@
                         <div class="pt-6 border-t mt-8">
                             <div class="flex justify-end">
                                 <button type="submit" class="inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors shadow-lg hover:shadow-xl">
-                                    Guardar y Continuar a Verificación
+                                    Registrar Postulante
                                     <svg class="ml-2 -mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                       <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                                     </svg>
