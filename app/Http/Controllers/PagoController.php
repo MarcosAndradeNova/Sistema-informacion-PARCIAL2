@@ -101,19 +101,21 @@ class PagoController extends Controller
                     $user->save();
                 }
 
-                try {
-                    DB::table('bitacora')->insert([
-                        'usuario' => $usuario->nombre . ' ' . $usuario->apellidopat,
-                        'accion' => "Inscripción completada en pasarela para CI: $ci.",
-                        'fecha' => now()->toDateString(),
-                        'hora' => now()->toTimeString()
-                    ]);
-                } catch (\Exception $e) {}
-
-                try {
-                    Mail::to($usuario->email)->send(new CredencialesMail($usuario->email, $ci));
-                } catch (\Exception $e) {}
             });
+
+            try {
+                DB::table('bitacora')->insert([
+                    'ciusuario' => $ci,
+                    'ip' => $request->ip(),
+                    'accion' => "Inscripción completada en pasarela para CI: $ci.",
+                    'fecha' => now()->toDateString(),
+                    'hora' => now()->toTimeString()
+                ]);
+            } catch (\Exception $e) {}
+
+            try {
+                Mail::to($usuario->email)->send(new CredencialesMail($usuario->email, $ci));
+            } catch (\Exception $e) {}
         }
 
         return redirect()->route('login')->with('success', '¡Felicidades! Tu pago ha sido procesado con éxito y ya eres Postulante Oficial. Inicia sesión para ver tu nuevo panel.');
@@ -123,7 +125,8 @@ class PagoController extends Controller
     {
         try {
             DB::table('bitacora')->insert([
-                'usuario' => 'Sistema (Pasarela)',
+                'ciusuario' => '0',
+                'ip' => request()->ip() ?? '127.0.0.1',
                 'accion' => $accion,
                 'fecha' => now()->toDateString(),
                 'hora' => now()->toTimeString()

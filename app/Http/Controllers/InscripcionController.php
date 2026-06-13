@@ -189,21 +189,23 @@ class InscripcionController extends Controller
                 $authUser->save();
             }
 
-            // 5. Registrar en bitácora
-            try {
-                DB::table('bitacora')->insert([
-                    'usuario' => $usuario->nombre . ' ' . $usuario->apellidopat,
-                    'accion' => "Inscripción completada mediante verificación de pago asíncrona para CI: $ci.",
-                    'fecha' => now()->toDateString(),
-                    'hora' => now()->toTimeString()
-                ]);
-            } catch (\Exception $e) {}
-
-            // 6. Enviar correo con credenciales
-            try {
-                \Illuminate\Support\Facades\Mail::to($usuario->email)->send(new \App\Mail\CredencialesMail($usuario->email, $ci));
-            } catch (\Exception $e) {}
         });
+
+        // 5. Registrar en bitácora (fuera para no abortar si falla)
+        try {
+            DB::table('bitacora')->insert([
+                'ciusuario' => $usuario->ci,
+                'ip' => request()->ip(),
+                'accion' => "Inscripción completada mediante verificación de pago asíncrona para CI: $ci.",
+                'fecha' => now()->toDateString(),
+                'hora' => now()->toTimeString()
+            ]);
+        } catch (\Exception $e) {}
+
+        // 6. Enviar correo con credenciales (fuera para no abortar si falla)
+        try {
+            \Illuminate\Support\Facades\Mail::to($usuario->email)->send(new \App\Mail\CredencialesMail($usuario->email, $ci));
+        } catch (\Exception $e) {}
 
         // Refrescar sesión para que tome el nuevo role "postulante" inmediatamente en el dashboard
         Auth::loginUsingId($user->id);
