@@ -95,6 +95,13 @@
                                 <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Profesión</th>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado Cuenta</th>
                             </tr>
+                            <!-- Encabezados para Grupos -->
+                            <tr x-show="currentType === 'grupos'" style="display: none;">
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Código</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nombre del Grupo</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Cupo Máximo</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Inscritos</th>
+                            </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <!-- Filas para Estudiantes -->
@@ -152,7 +159,26 @@
                                 </template>
                             </template>
 
-                            <tr x-show="(currentType === 'estudiantes' && filteredEstudiantes.length === 0) || (currentType === 'docentes' && filteredDocentes.length === 0)">
+                            <!-- Filas para Grupos -->
+                            <template x-if="currentType === 'grupos'">
+                                <template x-for="g in filteredGrupos" :key="g.codigo">
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono font-bold" x-text="g.codigo"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-bold text-gray-900" x-text="g.nombre"></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-bold text-gray-700" x-text="g.cupo"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="inline-flex items-center justify-center px-3 py-1 text-xs font-bold rounded-full border"
+                                                  :class="g.inscritos >= g.cupo ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700'"
+                                                  x-text="g.inscritos + ' inscritos'">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </template>
+
+                            <tr x-show="(currentType === 'estudiantes' && filteredEstudiantes.length === 0) || (currentType === 'docentes' && filteredDocentes.length === 0) || (currentType === 'grupos' && filteredGrupos.length === 0)">
                                 <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                                     <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     No se encontraron registros que coincidan con la búsqueda.
@@ -169,9 +195,10 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('reportesApp', () => ({
-                currentType: 'estudiantes', // estudiantes o docentes
+                currentType: 'estudiantes', // estudiantes, docentes o grupos
                 estudiantes: @json($estudiantesData),
                 docentes: @json($docentesData),
+                grupos: @json($gruposData ?? []),
                 searchQuery: '',
                 isListening: false,
                 recognition: null,
@@ -225,7 +252,7 @@
                     console.log("Comando recibido:", command);
                     
                     // Seleccionar tipo de reporte
-                    if (command.includes("docente") || command.includes("profesor")) {
+                    if (command.includes("docente") || command.includes("profesor") || command.includes("docentes") || command.includes("profesores")) {
                         this.currentType = 'docentes';
                         this.searchQuery = ''; // Si solo dice "lista de docentes", limpiamos la búsqueda
                         if (command.includes("aprobado")) this.searchQuery = "APROBADO";
@@ -233,7 +260,13 @@
                         return;
                     }
                     
-                    if (command.includes("postulante") || command.includes("estudiante") || command.includes("alumno")) {
+                    if (command === "los grupos" || command === "lista de grupos" || command === "mostrar grupos") {
+                        this.currentType = 'grupos';
+                        this.searchQuery = '';
+                        return;
+                    }
+
+                    if (command.includes("postulante") || command.includes("estudiante") || command.includes("alumno") || command.includes("aprobados") || command.includes("resultado de examen") || command.includes("reprobados")) {
                         this.currentType = 'estudiantes';
                     }
 
@@ -241,27 +274,51 @@
                     if (command.includes("sin grupo") || command.includes("no tienen grupo")) {
                         this.currentType = 'estudiantes';
                         this.searchQuery = "SIN GRUPO";
-                    } else if (command.includes("aprobados")) {
-                        this.searchQuery = "APROBADO";
-                    } else if (command.includes("reprobados") || command.includes("aplazados")) {
+                    } else if (command.includes("aprobados") || command.includes("aprobado") || command.includes("resultado de examen")) {
+                        this.currentType = 'estudiantes';
+                        if (command.includes("aprobados") || command.includes("aprobado")) {
+                            this.searchQuery = "APROBADO";
+                        }
+                        
+                        // Check if they said "de un grupo" or specific group
+                        const numMap = {"uno": 1, "dos": 2, "tres": 3, "cuatro": 4};
+                        let found = command.replace(/uno|dos|tres|cuatro/g, m => numMap[m]);
+                        let match = found.match(/(?:g|G)?\d+/);
+                        if (match) {
+                            let gNum = match[0].toUpperCase();
+                            if (!gNum.startsWith("G")) {
+                                gNum = "G" + gNum;
+                            }
+                            // Si dijo aprobados del grupo G1, unimos la busqueda
+                            if (this.searchQuery === "APROBADO") {
+                                // Alpine solo soporta un search query simple, pero como filter() verifica OR, no AND.
+                                // Asi que si quieren "aprobados del G1" necesitamos que nuestro filter entienda múltiples tags.
+                                // Para no complicarlo, filtraremos por Grupo primero
+                                this.searchQuery = "Grupo " + gNum;
+                            } else {
+                                this.searchQuery = "Grupo " + gNum;
+                            }
+                        }
+                    } else if (command.includes("reprobados") || command.includes("aplazados") || command.includes("reprobado")) {
                         this.searchQuery = "REPROBADO";
                     } else if (command.includes("inscritos")) {
                         this.currentType = 'estudiantes';
                         this.searchQuery = "INSCRITO";
                     } else if (command.includes("grupo")) {
-                        this.currentType = 'estudiantes';
-                        // Extraer numero, ej "grupo uno" o "grupo g1"
-                        const numMap = {"uno": 1, "dos": 2, "tres": 3, "cuatro": 4};
-                        let found = command.replace(/uno|dos|tres|cuatro/g, m => numMap[m]);
-                        let match = found.match(/(?:g|G)?\d+/); // puede capturar "1", "G1", "g1"
+                        // Puede ser "lista de grupos" o "estudiantes del grupo 1"
+                        const numMap = {"uno": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5, "seis": 6, "siete": 7};
+                        let found = command.replace(/uno|dos|tres|cuatro|cinco|seis|siete/g, m => numMap[m]);
+                        let match = found.match(/(?:g|G)?\d+/);
                         if (match) {
+                            this.currentType = 'estudiantes';
                             let gNum = match[0].toUpperCase();
                             if (!gNum.startsWith("G")) {
-                                gNum = "G" + gNum; // Si solo dijo "grupo 1", lo convertimos a "Grupo G1" para que coincida con la BD
+                                gNum = "G" + gNum; 
                             }
                             this.searchQuery = "Grupo " + gNum;
                         } else {
-                            this.searchQuery = command;
+                            this.currentType = 'grupos';
+                            this.searchQuery = '';
                         }
                     } else {
                         // Si no cae en nada en específico pero queremos buscar texto
@@ -294,8 +351,22 @@
                     });
                 },
 
+                get filteredGrupos() {
+                    if (this.searchQuery === '') return this.grupos;
+                    
+                    const lowerQuery = this.searchQuery.toLowerCase();
+                    return this.grupos.filter(g => {
+                        return g.nombre.toLowerCase().includes(lowerQuery) ||
+                               g.codigo.toLowerCase().includes(lowerQuery);
+                    });
+                },
+
                 get tituloReporte() {
-                    let base = this.currentType === 'docentes' ? 'Listado General de Docentes' : 'Listado General de Estudiantes';
+                    let base = 'Listado General';
+                    if (this.currentType === 'docentes') base = 'Listado General de Docentes';
+                    if (this.currentType === 'estudiantes') base = 'Listado General de Estudiantes';
+                    if (this.currentType === 'grupos') base = 'Listado General de Grupos';
+                    
                     if (this.searchQuery === '') return base;
                     return `Reporte Filtrado (${this.currentType}): "${this.searchQuery.toUpperCase()}"`;
                 },
@@ -324,11 +395,17 @@
                             let row = `${est.ci},${nom},${est.email},${est.grupo},${est.estado_docum},${est.promedio},${est.estado}`;
                             csvContent += row + "\n";
                         });
-                    } else {
+                    } else if (this.currentType === 'docentes') {
                         csvContent += "CI,Nombre,Email,Profesion,Estado\n";
                         this.filteredDocentes.forEach(doc => {
                             let nom = doc.nombre.replace(/,/g, '');
                             let row = `${doc.ci},${nom},${doc.email},${doc.profesion},${doc.estado}`;
+                            csvContent += row + "\n";
+                        });
+                    } else if (this.currentType === 'grupos') {
+                        csvContent += "Codigo,Nombre,Cupo,Inscritos\n";
+                        this.filteredGrupos.forEach(g => {
+                            let row = `${g.codigo},${g.nombre},${g.cupo},${g.inscritos}`;
                             csvContent += row + "\n";
                         });
                     }

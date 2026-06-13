@@ -61,8 +61,18 @@
                     </div>
                 </div>
             </div>
-
+            
             @if(Auth::user()->role === 'admin')
+            <div class="mb-8 flex justify-end">
+                <form action="{{ route('admin.grupos.auto_asignar') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition shadow-md flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Auto-Asignar Postulantes a Grupos
+                    </button>
+                </form>
+            </div>
+            
             <!-- Formulario de Creación de Grupo -->
             <div class="bg-white p-6 rounded-xl shadow-sm mb-8 flex justify-between items-center border border-gray-200">
                 <div>

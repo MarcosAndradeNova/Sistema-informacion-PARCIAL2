@@ -42,11 +42,17 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('docente.pendiente');
         }
 
+        // Verificamos si es administrador o coordinador
+        if ($usuario->tipo === 'A' || $usuario->tipo === 'C') {
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+
         // Buscamos si el usuario tiene un registro como postulante en el sistema
         $postulante = \App\Models\Postulante::where('ciusuario', $usuario->ci)->first();
 
         if (!$postulante) {
-            return redirect()->route('inscripcion.create');
+            // Si no tiene ficha de postulante ni es otro rol, mandarlo al dashboard vacío o con error
+            return redirect()->route('dashboard')->with('error', 'Tu cuenta no tiene una ficha de postulante asignada. Comunícate con administración.');
         } elseif ($postulante->estadodocum == 'INSCRITO') {
             // Redirigimos al dashboard principal si el postulante ya está activo
             return redirect()->intended(route('dashboard', absolute: false));

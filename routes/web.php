@@ -294,10 +294,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Grupos
     Route::get('/grupos', [\App\Http\Controllers\Admin\GrupoController::class, 'index'])->name('grupos.index');
+    Route::post('/grupos/auto-asignar', [\App\Http\Controllers\Admin\GrupoController::class, 'autoAssign'])->name('grupos.auto_asignar');
     Route::post('/grupos/store', [\App\Http\Controllers\Admin\GrupoController::class, 'store'])->name('grupos.store');
     Route::get('/grupos/{codigo}/edit', [\App\Http\Controllers\Admin\GrupoController::class, 'edit'])->name('grupos.edit');
     Route::put('/grupos/{codigo}', [\App\Http\Controllers\Admin\GrupoController::class, 'update'])->name('grupos.update');
     Route::get('/grupos/{id}', [\App\Http\Controllers\Admin\GrupoController::class, 'show'])->name('grupos.show');
+    
+    // Horarios
+    Route::resource('horarios', \App\Http\Controllers\Admin\HorarioController::class)->except(['create', 'show', 'edit']);
+
     
     // Reportes
     Route::get('/reportes', [\App\Http\Controllers\Admin\ReporteController::class, 'index'])->name('reportes.index');

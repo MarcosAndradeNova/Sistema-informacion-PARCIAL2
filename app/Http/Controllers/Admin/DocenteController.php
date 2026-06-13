@@ -62,6 +62,7 @@ class DocenteController extends Controller
                 'experiencia' => $request->experiencia,
                 'codrol' => 2,
                 'estado' => 'APROBADO',
+                'idmateria' => !empty($request->materias) ? $request->materias[0] : null,
             ]);
 
             // Guardar preferencias de materias
@@ -120,6 +121,7 @@ class DocenteController extends Controller
                 'profesion' => $request->profesion,
                 'nivelformacion' => $request->nivelformacion,
                 'experiencia' => $request->experiencia,
+                'idmateria' => !empty($request->materias) ? $request->materias[0] : null,
             ]);
 
             // Actualizar preferencias de materias

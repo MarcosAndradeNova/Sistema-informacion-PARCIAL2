@@ -151,10 +151,10 @@
 
             <!-- 4. Organización Académica y Grupos -->
             @if($showAcademica)
-            <div x-data="{ open: {{ request()->routeIs('admin.carreras.*', 'examenes.puntos', 'admin.grupos.*', 'admin.asignacion.*', 'admin.examenes.*', 'estudiante.mi_grupo', 'estudiante.mis_materias', 'docente.mis_grupos', 'docente.cronograma', 'docente.mi_horario') ? 'true' : 'false' }} }" class="space-y-1">
-                <button @click="if(collapsed) { collapsed = false; open = true; } else { open = !open; }" class="w-full group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-50 hover:text-indigo-600 {{ request()->routeIs('admin.carreras.*', 'examenes.puntos', 'admin.grupos.*', 'admin.asignacion.*', 'admin.examenes.*', 'estudiante.mi_grupo', 'estudiante.mis_materias', 'docente.mis_grupos', 'docente.cronograma', 'docente.mi_horario') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700' }}">
+            <div x-data="{ open: {{ request()->routeIs('admin.carreras.*', 'examenes.puntos', 'admin.grupos.*', 'admin.horarios.*', 'admin.asignacion.*', 'admin.examenes.*', 'estudiante.mi_grupo', 'estudiante.mis_materias', 'docente.mis_grupos', 'docente.cronograma', 'docente.mi_horario') ? 'true' : 'false' }} }" class="space-y-1">
+                <button @click="if(collapsed) { collapsed = false; open = true; } else { open = !open; }" class="w-full group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-50 hover:text-indigo-600 {{ request()->routeIs('admin.carreras.*', 'examenes.puntos', 'admin.grupos.*', 'admin.horarios.*', 'admin.asignacion.*', 'admin.examenes.*', 'estudiante.mi_grupo', 'estudiante.mis_materias', 'docente.mis_grupos', 'docente.cronograma', 'docente.mi_horario') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700' }}">
                     <div class="flex items-center">
-                        <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.carreras.*', 'examenes.puntos', 'admin.grupos.*', 'admin.asignacion.*', 'admin.examenes.*', 'estudiante.mi_grupo', 'estudiante.mis_materias', 'docente.mis_grupos', 'docente.cronograma', 'docente.mi_horario') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.carreras.*', 'examenes.puntos', 'admin.grupos.*', 'admin.horarios.*', 'admin.asignacion.*', 'admin.examenes.*', 'estudiante.mi_grupo', 'estudiante.mis_materias', 'docente.mis_grupos', 'docente.cronograma', 'docente.mi_horario') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                         <span x-show="!collapsed || sidebarOpen" class="text-left font-semibold leading-tight pr-2">Organización Académica y Grupos</span>
@@ -163,6 +163,7 @@
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </button>
+
                 <div x-show="open && !collapsed" class="pl-11 space-y-1 mt-1 border-l-2 border-indigo-100 ml-5">
                     @if($isAdmin)
                     <a href="{{ route('admin.carreras.index') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.carreras.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Gestionar Carreras</a>
@@ -172,6 +173,7 @@
                     <a href="{{ route('admin.grupos.index') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.grupos.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">{{ $isCoordinador ? 'Consulta de Grupos' : 'Gestionar Grupos' }}</a>
                     @endif
                     @if($isAdmin)
+                    <a href="{{ route('admin.horarios.index') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.horarios.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Gestionar Horarios y Aulas</a>
                     <a href="{{ route('admin.asignacion.index') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.asignacion.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Asignar Docente a Grupo</a>
                     <a href="{{ route('admin.examenes.index') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.examenes.*') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Gestionar Examen</a>
                     @endif
@@ -180,6 +182,7 @@
                     <a href="{{ route('estudiante.mis_materias') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('estudiante.mis_materias') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Visualizar Mis Materias</a>
                     @endif
                     @if($isDocenteAprobado)
+                    <a href="{{ route('docente.mi_materia') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('docente.mi_materia') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Mi Materia</a>
                     <a href="{{ route('docente.mis_grupos') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('docente.mis_grupos') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Visualizar Mis Grupos</a>
                     <a href="{{ route('docente.mi_horario') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('docente.mi_horario') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Ver mi Horario y Aulas</a>
                     <a href="{{ route('docente.cronograma') }}" class="block px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('docente.cronograma') ? 'text-indigo-700 font-bold' : 'text-gray-600 hover:text-indigo-600 hover:bg-gray-50' }}">Cronograma Exámenes</a>
@@ -238,99 +241,6 @@
                 </div>
             </div>
             @endif
-
-
-            <!-- SECCIÓN: PANEL ESTUDIANTE -->
-            @if($esPostulanteActivo)
-            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Mi Panel de Estudio</div>
-            
-            <a href="{{ route('estudiante.mi_grupo') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('estudiante.mi_grupo') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('estudiante.mi_grupo') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span x-show="!collapsed">Mi Grupo</span>
-            </a>
-
-            <a href="{{ route('estudiante.mis_materias') }}" class="mt-1 group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('estudiante.mis_materias') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('estudiante.mis_materias') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-                <span x-show="!collapsed">Mis Materias</span>
-            </a>
-
-            <a href="{{ route('estudiante.mis_examenes') }}" class="mt-1 group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('estudiante.mis_examenes') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('estudiante.mis_examenes') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <span x-show="!collapsed">Exámenes y Notas</span>
-            </a>
-            @endif
-
-            <!-- SECCIÓN: EXÁMENES -->
-            @if($isAdmin)
-            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Verificación de Exámenes</div>
-            
-            <a href="{{ route('admin.examenes.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.examenes.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.examenes.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-                <span x-show="!collapsed">Exámenes y Notas</span>
-            </a>
-
-            <a href="{{ route('examenes.puntos') }}" class="mt-1 group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('examenes.puntos') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('examenes.puntos') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span x-show="!collapsed">Gestionar Materias</span>
-            </a>
-            @endif
-
-            <!-- SECCIÓN: GRUPOS -->
-            @if($isAdmin)
-            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Gestión de Grupos</div>
-            <a href="{{ route('admin.grupos.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.grupos.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.grupos.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                <span x-show="!collapsed">Gestionar Grupos</span>
-            </a>
-
-            <!-- SECCIÓN: REPORTES -->
-            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Reportes</div>
-            <a href="{{ route('admin.reportes.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('admin.reportes.*') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('admin.reportes.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <span x-show="!collapsed">Generar Reportes</span>
-            </a>
-            @endif
-
-            @if($isDocenteAprobado)
-            <!-- SECCIÓN: PANEL DOCENTE -->
-            <div x-show="!collapsed" class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6 px-3">Mi Panel de Docente</div>
-            
-            <a href="{{ route('docente.mi_materia') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('docente.mi_materia') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('docente.mi_materia') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                <span x-show="!collapsed">Mi Materia</span>
-            </a>
-            
-            <a href="{{ route('docente.mis_grupos') }}" class="mt-1 group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('docente.mis_grupos') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('docente.mis_grupos') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                <span x-show="!collapsed">Mis Grupos</span>
-            </a>
-
-            <a href="{{ route('docente.calificaciones') }}" class="mt-1 group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('docente.calificaciones') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('docente.calificaciones') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span x-show="!collapsed">Calificaciones</span>
-            </a>
-            
-            <a href="{{ route('docente.cronograma') }}" class="mt-1 group flex items-center px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('docente.cronograma') ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50 hover:text-indigo-600' }}">
-                <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 {{ request()->routeIs('docente.cronograma') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span x-show="!collapsed">Cronograma Exámenes</span>
-            </a>
-            @endif
-
 
         </nav>
 

@@ -81,14 +81,21 @@ class GrupoController extends Controller
                 return redirect()->route('admin.grupos.index')->with('info', 'No hay postulantes pendientes por asignar.');
             }
 
+            // Cache current group capacities
+            $grupos = Grupo::all()->keyBy('codigo');
+            $grupoInscritos = [];
+            foreach ($grupos as $codigo => $g) {
+                $grupoInscritos[$codigo] = \App\Models\Postulacion::where('codgrupo', $codigo)->count();
+            }
+
+            $bulkUpdates = [];
+
             foreach ($postulantes as $postulante) {
-                // Find a group with available capacity
-                $grupos = Grupo::all();
                 $grupoDisponible = null;
                 
-                foreach ($grupos as $g) {
-                    $inscritos = \App\Models\Postulacion::where('codgrupo', $g->codigo)->count();
-                    if ($inscritos < $g->cupo) {
+                // Find a group with available capacity in memory
+                foreach ($grupos as $codigo => $g) {
+                    if ($grupoInscritos[$codigo] < ($g->cupo ?? 70)) {
                         $grupoDisponible = $g;
                         break;
                     }
@@ -104,13 +111,18 @@ class GrupoController extends Controller
                         'cupo' => 70,
                         'idturno' => 1
                     ]);
+                    $grupos[$nuevoCodigo] = $grupoDisponible;
+                    $grupoInscritos[$nuevoCodigo] = 0;
                 }
 
-                $postulacion = \App\Models\Postulacion::where('ciusuario', $postulante->ciusuario)->first();
-                if ($postulacion) {
-                    $postulacion->codgrupo = $grupoDisponible->codigo;
-                    $postulacion->save();
-                }
+                // En lugar de guardar 1 por 1, lo preparamos para un bulk update
+                $bulkUpdates[$grupoDisponible->codigo][] = $postulante->ciusuario;
+                $grupoInscritos[$grupoDisponible->codigo]++;
+            }
+
+            // Realizar las actualizaciones masivas
+            foreach ($bulkUpdates as $codigo => $ciList) {
+                \App\Models\Postulacion::whereIn('ciusuario', $ciList)->update(['codgrupo' => $codigo]);
             }
 
             DB::commit();

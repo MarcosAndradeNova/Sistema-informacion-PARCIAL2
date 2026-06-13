@@ -57,7 +57,19 @@ class ReporteController extends Controller
             ];
         }
 
-        return view('admin.reportes.index', compact('estudiantesData', 'docentesData'));
+        $gruposDB = Grupo::all();
+        $gruposData = [];
+        foreach ($gruposDB as $g) {
+            $inscritos = \App\Models\Postulacion::where('codgrupo', $g->codigo)->count();
+            $gruposData[] = [
+                'codigo' => $g->codigo,
+                'nombre' => $g->nombre,
+                'cupo' => $g->cupo,
+                'inscritos' => $inscritos
+            ];
+        }
+
+        return view('admin.reportes.index', compact('estudiantesData', 'docentesData', 'gruposData'));
     }
 
     public function exportCsv(Request $request)

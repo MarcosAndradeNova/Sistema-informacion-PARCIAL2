@@ -119,6 +119,7 @@ class DocenteRegistrationController extends Controller
                 'nivelformacion' => $request->nivel_formacion,
                 'codrol' => 2,
                 'estado' => 'PENDIENTE',
+                'idmateria' => !empty($request->materias) ? $request->materias[0] : null,
             ]
         );
         // Guardar las preferencias de materias
