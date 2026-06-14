@@ -14,20 +14,24 @@ class ReporteController extends Controller
 {
     public function index()
     {
-        // Obtener todos los postulantes con su información, grupo y notas
-        $postulantes = Postulante::with(['usuario', 'postulaciones.grupo'])->get();
+        // Obtener todos los postulantes con su información y postulaciones
+        $postulantes = Postulante::with(['usuario', 'postulaciones'])->get();
         
+        // OPTIMIZACIÓN: Traer todas las notas de una sola vez y agruparlas por usuario en memoria (evita problema N+1)
+        $allNotas = \App\Models\ResultadoExam::all()->groupBy('ciusuario');
+
         $estudiantesData = [];
 
         foreach ($postulantes as $p) {
             $grupo = 'SIN GRUPO';
-            if ($p->postulaciones->count() > 0 && $p->postulaciones->first()->grupo) {
+            if ($p->postulaciones->count() > 0 && $p->postulaciones->first()->codgrupo) {
                 $grupo = 'Grupo ' . $p->postulaciones->first()->codgrupo;
             }
 
-            // Obtener notas
-            $notas = \App\Models\ResultadoExam::where('ciusuario', $p->ciusuario)->get();
-            // Calcular un promedio general muy simplificado para el reporte (promedio de todas sus notas)
+            // Recuperar notas desde la colección en memoria
+            $notas = $allNotas->get($p->ciusuario, collect());
+            
+            // Calcular un promedio general
             $promedio = $notas->count() > 0 ? $notas->avg('calificacion') : 0;
             $estado = $promedio >= 51 ? 'APROBADO' : 'REPROBADO';
             if ($notas->count() == 0) {
@@ -58,9 +62,15 @@ class ReporteController extends Controller
         }
 
         $gruposDB = Grupo::all();
+        
+        // OPTIMIZACIÓN: Contar inscritos de todos los grupos de una sola vez (evita problema N+1)
+        $inscritosPorGrupo = \App\Models\Postulacion::select('codgrupo', DB::raw('count(*) as total'))
+            ->groupBy('codgrupo')
+            ->pluck('total', 'codgrupo');
+
         $gruposData = [];
         foreach ($gruposDB as $g) {
-            $inscritos = \App\Models\Postulacion::where('codgrupo', $g->codigo)->count();
+            $inscritos = $inscritosPorGrupo->get($g->codigo, 0);
             $gruposData[] = [
                 'codigo' => $g->codigo,
                 'nombre' => $g->nombre,
