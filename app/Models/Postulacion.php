@@ -39,4 +39,9 @@ class Postulacion extends Model
     {
         return $this->belongsTo(Postulante::class, 'ciusuario', 'ciusuario');
     }
+
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'ciusuario', 'ci');
+    }
 }
