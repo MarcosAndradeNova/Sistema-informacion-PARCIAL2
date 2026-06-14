@@ -159,8 +159,9 @@ class EvaluacionController extends Controller
             $usuario = $p->usuario;
             if ($usuario && $usuario->email) {
                 try {
+                    // Usar queue() en lugar de send() para evitar colgar la página por el tiempo de red
                     \Illuminate\Support\Facades\Mail::to($usuario->email)
-                        ->send(new \App\Mail\ResultadoAdmisionMail($usuario, $p));
+                        ->queue(new \App\Mail\ResultadoAdmisionMail($usuario, $p));
                     $count++;
                 } catch (\Exception $e) {
                     // Ignorar errores de envío individual para no detener el proceso
@@ -168,6 +169,6 @@ class EvaluacionController extends Controller
             }
         }
         
-        return redirect()->back()->with('success', "Notificaciones enviadas por correo a {$count} estudiantes.");
+        return redirect()->back()->with('success', "Notificaciones puestas en cola para {$count} estudiantes. (Se enviarán en segundo plano).");
     }
 }
