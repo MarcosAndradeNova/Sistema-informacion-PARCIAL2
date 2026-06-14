@@ -24,28 +24,45 @@ class EvaluacionController extends Controller
             $grupoSeleccionado = Grupo::where('codigo', $request->grupo_id)->first();
 
             if ($materiaSeleccionada && $grupoSeleccionado) {
-                // Obtener los estudiantes del grupo con sus notas en la materia
-                $estudiantes = DB::table('inscribe')
-                    ->join('postulante', 'inscribe.cipostulante', '=', 'postulante.ciusuario')
-                    ->join('usuario', 'postulante.ciusuario', '=', 'usuario.ci')
-                    ->leftJoin('calificacion', function($join) use ($materiaSeleccionada) {
-                        $join->on('inscribe.cipostulante', '=', 'calificacion.cipostulante')
-                             ->where('calificacion.idmateria', '=', $materiaSeleccionada->id);
-                    })
-                    ->where('inscribe.codigogrupo', $grupoSeleccionado->codigo)
-                    ->select(
-                        'usuario.ci',
-                        'usuario.nombre',
-                        'usuario.apellidopat',
-                        'usuario.apellidomat',
-                        'calificacion.nota1',
-                        'calificacion.nota2',
-                        'calificacion.nota3',
-                        'calificacion.nota4',
-                        'calificacion.nota5',
-                        'calificacion.notafinal'
-                    )
+                // Obtener estudiantes mediante Postulacion usando el nuevo esquema
+                $postulaciones = \App\Models\Postulacion::where('codgrupo', $grupoSeleccionado->codigo)
+                    ->with('usuario')
                     ->get();
+                    
+                $calificaciones = \App\Models\ResultadoExam::where('idmateria', $materiaSeleccionada->id)
+                    ->get()
+                    ->groupBy('ciusuario');
+
+                $estudiantesCollection = collect();
+
+                foreach ($postulaciones as $p) {
+                    if (!$p->usuario) continue;
+                    
+                    $notas = $calificaciones->get($p->ciusuario, collect());
+                    $est = new \stdClass();
+                    $est->ci = $p->usuario->ci;
+                    $est->nombre = $p->usuario->nombre;
+                    $est->apellidopat = $p->usuario->apellidopat;
+                    $est->apellidomat = $p->usuario->apellidomat;
+                    
+                    $est->nota1 = $notas->where('nroexamen', 1)->first()->calificacion ?? null;
+                    $est->nota2 = $notas->where('nroexamen', 2)->first()->calificacion ?? null;
+                    $est->nota3 = $notas->where('nroexamen', 3)->first()->calificacion ?? null;
+                    $est->nota4 = null;
+                    $est->nota5 = null;
+                    
+                    // Calculamos promedio de la materia
+                    $totalNotas = 0;
+                    $countNotas = 3; // Promedio entre 3 exámenes
+                    if ($est->nota1 !== null) { $totalNotas += $est->nota1; }
+                    if ($est->nota2 !== null) { $totalNotas += $est->nota2; }
+                    if ($est->nota3 !== null) { $totalNotas += $est->nota3; }
+                    
+                    $est->notafinal = round($totalNotas / $countNotas, 2);
+                    
+                    $estudiantesCollection->push($est);
+                }
+                $estudiantes = $estudiantesCollection;
             }
         }
 
