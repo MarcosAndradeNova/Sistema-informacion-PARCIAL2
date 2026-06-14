@@ -14,8 +14,13 @@ class GrupoController extends Controller
     public function index()
     {
         $grupos = Grupo::all();
+        
+        $counts = \App\Models\Postulacion::select('codgrupo', DB::raw('count(*) as total'))
+            ->groupBy('codgrupo')
+            ->pluck('total', 'codgrupo');
+
         foreach($grupos as $g) {
-            $g->postulantes_count = \App\Models\Postulacion::where('codgrupo', $g->codigo)->count();
+            $g->postulantes_count = $counts->get($g->codigo, 0);
         }
         
         $totalVerificados = Postulante::where('estadodocum', 'INSCRITO')->count();

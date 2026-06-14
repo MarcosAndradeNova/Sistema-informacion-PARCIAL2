@@ -15,7 +15,7 @@ class AdminController extends Controller
             ->join('usuario', 'postulante.ciusuario', '=', 'usuario.ci')
             ->select('postulante.*', 'usuario.nombre', 'usuario.apellidopat', 'usuario.apellidomat', 'usuario.email')
             ->orderBy('usuario.apellidopat')
-            ->get();
+            ->paginate(20);
 
         return view('admin.postulantes.index', compact('postulantes'));
     }
