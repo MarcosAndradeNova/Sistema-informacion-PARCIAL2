@@ -62,29 +62,33 @@ class EvaluacionController extends Controller
             ->groupBy('codpost')
             ->pluck('promedio', 'codpost');
 
-        // 1. Calcular promedio para cada postulante
-        DB::transaction(function () use ($postulaciones, $promedios) {
-            foreach ($postulaciones as $p) {
-                $promedio_calc = $promedios->get($p->codpost, 0);
-                
-                $p->promedio = round($promedio_calc, 2);
-                
-                if ($p->promedio >= 60) {
-                    $p->estado_admision = 'APROBADO_PENDIENTE';
-                } else {
-                    $p->estado_admision = 'REPROBADO';
-                }
-                $p->carrera_admitida = null;
-                $p->save();
+        // 1. Calcular promedio para cada postulante usando UPSERT masivo
+        $dataUpsert1 = [];
+        foreach ($postulaciones as $p) {
+            $row = $p->getAttributes();
+            $promedio_calc = $promedios->get($p->codpost, 0);
+            
+            $row['promedio'] = round($promedio_calc, 2);
+            if ($row['promedio'] >= 60) {
+                $row['estado_admision'] = 'APROBADO_PENDIENTE';
+            } else {
+                $row['estado_admision'] = 'REPROBADO';
             }
-        });
+            $row['carrera_admitida'] = null;
+            $dataUpsert1[] = $row;
+        }
+
+        // Ejecutar upsert en trozos (chunks) para no saturar la sentencia SQL
+        foreach (array_chunk($dataUpsert1, 100) as $chunk) {
+            \App\Models\Postulacion::upsert($chunk, ['codpost'], ['promedio', 'estado_admision', 'carrera_admitida']);
+        }
 
         // 2. Asignar cupos a los aprobados ordenados por mejor promedio
         $aprobados = \App\Models\Postulacion::where('estado_admision', 'APROBADO_PENDIENTE')
                         ->orderBy('promedio', 'desc')
                         ->get();
                         
-        // Traer cupos disponibles por carrera (asumiendo que en 'ofrece' se declaran los cupos)
+        // Traer cupos disponibles por carrera
         $ofrece = DB::table('ofrece')->get();
         $cupos_disponibles = [];
         foreach ($ofrece as $o) {
@@ -97,30 +101,33 @@ class EvaluacionController extends Controller
             ->get()
             ->groupBy('codpost');
 
-        DB::transaction(function () use ($aprobados, &$cupos_disponibles, $todasInscripciones) {
-            foreach ($aprobados as $p) {
-                $inscripciones = $todasInscripciones->get($p->codpost, collect());
-                
-                $admitido = false;
-                foreach ($inscripciones as $ins) {
-                    $carrera = $ins->codigocarrera;
-                    if (isset($cupos_disponibles[$carrera]) && $cupos_disponibles[$carrera] > 0) {
-                        $p->estado_admision = 'ADMITIDO';
-                        $p->carrera_admitida = $carrera;
-                        $p->save();
-                        
-                        $cupos_disponibles[$carrera]--;
-                        $admitido = true;
-                        break;
-                    }
-                }
-                
-                if (!$admitido) {
-                    $p->estado_admision = 'APROBADO_SIN_CUPO';
-                    $p->save();
+        // Calcular cupos usando array temporal para hacer otro UPSERT masivo
+        $dataUpsert2 = [];
+        foreach ($aprobados as $p) {
+            $row = $p->getAttributes();
+            $inscripciones = $todasInscripciones->get($p->codpost, collect());
+            
+            $admitido = false;
+            foreach ($inscripciones as $ins) {
+                $carrera = $ins->codigocarrera;
+                if (isset($cupos_disponibles[$carrera]) && $cupos_disponibles[$carrera] > 0) {
+                    $row['estado_admision'] = 'ADMITIDO';
+                    $row['carrera_admitida'] = $carrera;
+                    $cupos_disponibles[$carrera]--;
+                    $admitido = true;
+                    break;
                 }
             }
-        });
+            
+            if (!$admitido) {
+                $row['estado_admision'] = 'APROBADO_SIN_CUPO';
+            }
+            $dataUpsert2[] = $row;
+        }
+
+        foreach (array_chunk($dataUpsert2, 100) as $chunk) {
+            \App\Models\Postulacion::upsert($chunk, ['codpost'], ['estado_admision', 'carrera_admitida']);
+        }
 
         return redirect()->back()->with('success', 'Los promedios y cupos de admisión fueron calculados exitosamente.');
     }
